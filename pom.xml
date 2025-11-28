@@ -67,7 +67,7 @@
                 <version>3.0.0-M6</version>
                 <configuration>
                     <!-- Provide a java.util.logging config file to reduce noisy WebDriver/Netty warnings -->
-                    <argLine>-Djava.util.logging.config.file=${basedir}/src/test/resources/logging.properties</argLine>
+                    <argLine>-Djava.util.logging.config.file=${basedir}/src/test/resources/properties/logging.properties</argLine>
                     <testFailureIgnore>true</testFailureIgnore>
                     <runOrder>Alphabetical</runOrder>
                     <!--  <rerunFailingTestsCount>2</rerunFailingTestsCount> -->

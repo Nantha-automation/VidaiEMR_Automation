@@ -1,6 +1,6 @@
 package com.EMR.utilities;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ConfigurationReader {
@@ -9,17 +9,19 @@ public class ConfigurationReader {
 
     static {
         try {
-            //path of file which is wanted to read
-            String path = "configuration.properties";
+            // Load configuration.properties from classpath under /properties/
+            String resourcePath = "/properties/configuration.properties";
 
-            //read file into Java
-            //using string path to find the file
-            FileInputStream input = new FileInputStream(path);
+            // Read file from classpath to avoid hardcoded filesystem paths
+            InputStream input = ConfigurationReader.class.getResourceAsStream(resourcePath);
+            if (input == null) {
+                throw new RuntimeException("Configuration file not found on classpath: " + resourcePath);
+            }
 
-            //properties--> class can store data (properties) in key/value format
+            // properties can store data (properties) in key/value format
             properties = new Properties();
 
-            //the values (data) from input is loaded to the properties object
+            // load the values from input to the properties object
             properties.load(input);
             input.close();
         } catch (Exception e) {
