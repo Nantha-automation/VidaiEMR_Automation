@@ -1,6 +1,5 @@
 package com.EMR.pages;
 
-
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.JsonUtils;
 import org.openqa.selenium.WebElement;
@@ -20,7 +19,6 @@ public class LoginPage extends BasePage {
     @FindBy(xpath = "//div[text()='Invalid credentials']")
     public WebElement errorMessage;
 
-
     public void validLogin() {
 
         username.sendKeys(JsonUtils.getValue("validLogin", "username"));
@@ -34,7 +32,6 @@ public class LoginPage extends BasePage {
         password.sendKeys(JsonUtils.getValue("invalidLogin", "password"));
     }
 
-
     public void loginButtonClick() {
         loginButton.click();
     }
@@ -47,6 +44,5 @@ public class LoginPage extends BasePage {
             return false;
         }
     }
-
 
 }

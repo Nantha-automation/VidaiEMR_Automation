@@ -421,4 +421,41 @@ public class BrowserUtils {
         element.sendKeys(text);
     }
 
+    public static void selectRadioByValue(List<WebElement> radios, String value) {
+        for (WebElement radio : radios) {
+            if (radio.getAttribute("value").equalsIgnoreCase(value)) {
+                if (!radio.isSelected()) {
+                    radio.click();
+                }
+                break;
+            }
+        }
+    }
+
+    public static void enterDateById(String id, String dateValue) {
+        WebElement dateField = Driver.get().findElement(By.id(id));
+        dateField.clear();
+        dateField.sendKeys(dateValue);
+    }
+
+    /**
+     * Execute a step with automatic try-catch handling, logging, and screenshot capture
+     * Reduces code duplication for step definitions
+     *
+     * @param stepName The name of the step for logging
+     * @param executor The step execution logic (lambda or method reference)
+     */
+    public static void executeStep(String stepName, StepExecutor executor) {
+        try {
+            executor.execute();
+            ExtentReportManager.logStepPass(stepName);
+        } catch (AssertionError e) {
+            ExtentReportManager.logStepFailWithScreenshot(stepName + " - " + e.getMessage(), stepName);
+            throw e;
+        } catch (Exception e) {
+            ExtentReportManager.logStepFailWithScreenshot(stepName + " - " + e.getMessage(), stepName);
+            throw new AssertionError(e);
+        }
+    }
+
 }

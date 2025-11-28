@@ -57,11 +57,6 @@
             <artifactId>extentreports</artifactId>
             <version>5.0.9</version>
         </dependency>
-        <dependency>
-            <groupId>tech.grasshopper</groupId>
-            <artifactId>extentreports-cucumber7-adapter</artifactId>
-            <version>1.13.0</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -71,6 +66,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M6</version>
                 <configuration>
+                    <!-- Provide a java.util.logging config file to reduce noisy WebDriver/Netty warnings -->
+                    <argLine>-Djava.util.logging.config.file=${basedir}/src/test/resources/logging.properties</argLine>
                     <testFailureIgnore>true</testFailureIgnore>
                     <runOrder>Alphabetical</runOrder>
                     <!--  <rerunFailingTestsCount>2</rerunFailingTestsCount> -->
@@ -79,6 +76,33 @@
                         <!--   <include>**/*FailedTestRunner.java</include>-->
                     </includes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>cleanup-old-extent-reports</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>powershell</executable>
+                            <arguments>
+                                <argument>-ExecutionPolicy</argument>
+                                <argument>Bypass</argument>
+                                <argument>-File</argument>
+                                <argument>${project.basedir}/scripts/cleanup-old-extents.ps1</argument>
+                                <argument>-ReportsDir</argument>
+                                <argument>${project.basedir}/test-output/ExtentReports</argument>
+                                <argument>-MaxFiles</argument>
+                                <argument>10</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>net.masterthought</groupId>

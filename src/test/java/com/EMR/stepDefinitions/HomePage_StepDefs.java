@@ -15,17 +15,21 @@ public class HomePage_StepDefs {
 
     @Then("Verify that Logged in as username is visible")
     public void verify_that_logged_in_as_username_is_visible() {
-        BrowserUtils.click(homePage.close);
-        String expectedText = JsonUtils.getValue("validLogin", "username");
-        String actualText = homePage.loggedInUser.getText();
-        // System.out.println(actualText);
-        Assert.assertTrue("Expected text to contain username, but got: " + actualText, actualText.contains(expectedText));
+        String stepName = "Verify that Logged in as username is visible";
+        BrowserUtils.executeStep(stepName, () -> {
+            BrowserUtils.click(homePage.close);
+            String expectedText = JsonUtils.getValue("validLogin", "username");
+            String actualText = homePage.loggedInUser.getText();
+            Assert.assertTrue("Expected text to contain username as Expected username, but got: " + actualText, actualText.contains(expectedText));
+        });
     }
 
     @When("The user clicks Logout menu button")
     public void The_user_clicks_Logout_menu_button() {
-        homePage.logout();
-        
+        String stepName = "The user clicks Logout menu button";
+        BrowserUtils.executeStep(stepName, () -> {
+            homePage.logout();
+        });
     }
 
 }

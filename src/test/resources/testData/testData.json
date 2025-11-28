@@ -6,5 +6,59 @@
   "invalidLogin": {
     "username": "Amelia1",
     "password": "wrong123"
+  },
+  "registration": {
+    "registrationPageUrl": "https://staging-use1.vidaisolutions.com/admin/registration",
+    "searchBy": [
+      "patient",
+      "SPERM_DONOR",
+      "OOCYTE_DONOR",
+      "SURROGATE"
+    ],
+    "searchPatient": "John Doe",
+    "startDate": "2025-02-01",
+    "endDate": "2025-03-10",
+    "newRegistration": {
+      "newRegistrationPageURL": "https://staging-use1.vidaisolutions.com/admin/registration/patient-partner-registration",
+      "registrationType": [
+        "PATIENT_COUPLE",
+        "PATIENT_SINGLE",
+        "SPERM_DONOR",
+        "OOCYTE_DONOR",
+        "SURROGATE"
+      ],
+      "patientInformation": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "sexAssignedAtBirth": "Male",
+        "dob": "1990-05-15",
+        "idType": "Driver's License",
+        "id": "D1234567",
+        "reasonOfVisit": "General Checkup",
+        "ethinicity": "Not Hispanic or Latino",
+        "countryCode": "+1",
+        "mobileNumber": "5551234567",
+        "address": "123 Main St, Anytown, USA",
+        "country": "United States",
+        "state": "California",
+        "city": "Los Angeles",
+        "areaCode": "90001"
+      },
+      "partnerInformation": {
+        "partnerFirstName": "Jane",
+        "partnerLastName": "Smith",
+        "partnerSexAssignedAtBirth": "Female",
+        "partnerDob": "1988-08-20",
+        "partnerIdType": "Passport",
+        "partnerId": "P9876543",
+        "partnerCountryCode": "+1",
+        "partnerMobileNumber": "5559876543",
+        "partnerAddress": "456 Elm St, Othertown, USA",
+        "partnerCountry": "United States",
+        "partnerState": "California",
+        "partnerCity": "San Francisco",
+        "partnerAreaCode": "94101"
+      }
+    }
   }
 }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extentreports>
+    <configuration>
+        <!-- report theme -->
+        <!-- standard, dark -->
+        <theme>dark</theme>
+
+        <!-- document encoding -->
+        <!-- utf-8, utf-16 -->
+        <encoding>utf-8</encoding>
+
+        <!-- protocol for script src -->
+        <!-- https, http -->
+        <protocol>https</protocol>
+
+        <!-- report title -->
+        <reportName>Vidai AI-Powered EMR BDD Automation Test Report</reportName>
+
+        <!-- report headline -->
+        <documentTitle>Test Execution Report</documentTitle>
+
+        <!-- report timestamp format -->
+        <timeStampFormat>MMM dd, yyyy HH:mm:ss</timeStampFormat>
+
+        <!-- Enable/Disable offline mode -->
+        <!-- offline requires chart plugin under root, see README wiki -->
+        <!-- 0 - download from cdn -->
+        <!-- 1 - offline mode -->
+        <offlineMode>false</offlineMode>
+
+        <!-- script CDN -->
+        <!-- if empty, uses base cdn location -->
+        <scriptcdn></scriptcdn>
+
+        <!-- style CDN -->
+        <!-- if empty, uses base cdn location -->
+        <stylecdn></stylecdn>
+
+        <!-- custom script, read hero for instructions -->
+        <scripts>
+            <!-- <script><![CDATA[
+/* enter custom script here */
+]]></script> -->
+        </scripts>
+
+        <!-- custom style, read hero for instructions -->
+        <styles>
+            <!-- <style><![CDATA[
+/* enter custom style here */
+]]></style> -->
+        </styles>
+    </configuration>
+</extentreports>
