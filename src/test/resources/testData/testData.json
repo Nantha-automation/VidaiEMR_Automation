@@ -1,0 +1,10 @@
+{
+  "validLogin": {
+    "username": "Amelia",
+    "password": "A@126#%&34$!"
+  },
+  "invalidLogin": {
+    "username": "Amelia1",
+    "password": "wrong123"
+  }
+}
