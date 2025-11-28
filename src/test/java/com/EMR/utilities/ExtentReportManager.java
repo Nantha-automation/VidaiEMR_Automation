@@ -14,6 +14,7 @@ import java.util.Date;
  * ExtentReports Manager for generating detailed HTML test reports with screenshots
  * Supports step-by-step test execution reporting
  */
+@SuppressWarnings("unused")
 public class ExtentReportManager {
 
     private static ExtentReports extentReports;
