@@ -74,6 +74,28 @@ public class ExtentReportManager {
     }
 
     /**
+     * Log a step with PASS status and attach screenshot inline
+     * @param message Step description
+     * @param stepName Name of the step for screenshot naming
+     */
+    public static void logStepPassWithScreenshot(String message, String stepName) {
+        String logMsg = "✓ " + message;
+        if (extentTest != null) {
+            try {
+                com.aventstack.extentreports.ExtentTest passNode = extentTest.pass(logMsg);
+                String screenshotPath = BrowserUtils.getScreenshot(stepName.replaceAll("[^a-zA-Z0-9-_]", "_"));
+                String fileName = new File(screenshotPath).getName();
+                String relativePath = "../Screenshots/" + fileName;
+                passNode.addScreenCaptureFromPath(relativePath, stepName + " - PASSED");
+            } catch (Exception e) {
+                extentTest.pass(logMsg + " | Screenshot capture failed: " + e.getMessage());
+            }
+        } else {
+            System.out.println("[EXTENT NULL] " + logMsg);
+        }
+    }
+
+    /**
      * Log a step with FAIL status
      *
      * @param message Step description
@@ -198,7 +220,15 @@ public class ExtentReportManager {
         } else if (scenario.getStatus().name().equalsIgnoreCase("SKIPPED")) {
             extentTest.skip("Test skipped: " + scenario.getName());
         } else {
-            extentTest.pass("Test passed: " + scenario.getName());
+            // Attach a final success screenshot at scenario end as well
+            try {
+                String screenshotPath = BrowserUtils.getScreenshot(("Success_" + scenario.getName()).replaceAll("[^a-zA-Z0-9-_]", "_"));
+                String fileName = new File(screenshotPath).getName();
+                String relativePath = "../Screenshots/" + fileName;
+                extentTest.pass("Test passed: " + scenario.getName()).addScreenCaptureFromPath(relativePath, "Scenario Passed");
+            } catch (Exception e) {
+                extentTest.pass("Test passed: " + scenario.getName() + " | Screenshot capture failed: " + e.getMessage());
+            }
         }
     }
 

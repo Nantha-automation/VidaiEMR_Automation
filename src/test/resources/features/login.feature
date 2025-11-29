@@ -3,7 +3,7 @@ Feature: Login
 
 Background:
     Given The user is on the Login page
-
+  
   @smoke @login1
   Scenario: Login User with correct email and password
     When The user enters correct username and password

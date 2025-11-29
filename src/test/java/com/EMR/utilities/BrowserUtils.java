@@ -3,6 +3,7 @@ package com.EMR.utilities;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.openqa.selenium.*;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,6 +16,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class BrowserUtils {
     /*
@@ -438,6 +440,59 @@ public class BrowserUtils {
         dateField.sendKeys(dateValue);
     }
 
+    // Generic dropdown selection for MUI-like inputs that open a list and select by visible text
+    public static void selectFromDropdown(WebElement dropdown, String visibleText) {
+        click(dropdown);
+        By option = By.xpath(String.format("//li[normalize-space()='%s' or .//span[normalize-space()='%s']]", visibleText, visibleText));
+        waitForVisibility(option, 10).click();
+    }
+
+    // Wait until element is enabled/interactive using supplier to re-query element if needed
+    public static void waitUntilEnabled(Supplier<WebElement> elementSupplier, int timeoutSeconds) {
+        long end = System.currentTimeMillis() + timeoutSeconds * 1000L;
+        while (System.currentTimeMillis() < end) {
+            try {
+                WebElement el = elementSupplier.get();
+                if (el.isEnabled()) return;
+            } catch (StaleElementReferenceException ignored) {}
+            waitFor(1);
+        }
+        throw new TimeoutException("Element was not enabled within timeout");
+    }
+
+    // For inputs with autocomplete behavior: type text and press ENTER to select
+    public static void selectAutocompleteInput(WebElement input, String text) {
+        input.click();
+        try { input.clear(); } catch (Exception ignored) {}
+        input.sendKeys(text);
+        waitFor(1);
+        input.sendKeys(Keys.ENTER);
+    }
+
+    // Open a dropdown input and select the first available option (e.g., for State/City post-enablement)
+    public static void selectFirstOptionFromOpenDropdown() {
+        By firstOption = By.xpath("(//ul//li[not(@aria-disabled='true')])[1]");
+        waitForVisibility(firstOption, 10).click();
+    }
+
+    // Type into an input and submit via ENTER (useful for search fields)
+    public static void typeAndEnter(WebElement element, String text) {
+        clearAndSendKeys(element, text);
+        element.sendKeys(Keys.ENTER);
+    }
+
+    // Check if any element containing the given text is present within timeout
+    public static boolean isTextPresent(String text, int timeoutSeconds) {
+        By by = By.xpath("//*[contains(normalize-space(.), '" + text + "')]");
+        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(by));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     /**
      * Execute a step with automatic try-catch handling, logging, and screenshot capture
      * Reduces code duplication for step definitions
@@ -448,6 +503,7 @@ public class BrowserUtils {
     public static void executeStep(String stepName, StepExecutor executor) {
         try {
             executor.execute();
+            // On pass, only log pass without screenshot (final screenshot is added at scenario end)
             ExtentReportManager.logStepPass(stepName);
         } catch (AssertionError e) {
             ExtentReportManager.logStepFailWithScreenshot(stepName + " - " + e.getMessage(), stepName);
