@@ -84,13 +84,13 @@ public class Registration extends BasePage {
     @FindBy(id = "preferred-language-select")
     public WebElement newRegistrationPreferredLanguage;
 
-    @FindBy(xpath = "(//label[text()='Country Code'])[1]")
+    @FindBy(xpath = "(//label[contains(., 'Country Code')]/following::input[@role='combobox'])[1]")
     public WebElement newRegistrationCountryCodeMobile;
 
     @FindBy(id = "mobile-number")
     public WebElement newRegistrationMobileNumber;
 
-    @FindBy(xpath = "(//label[text()='Country Code'])[2]")
+    @FindBy(xpath = "(//label[contains(., 'Country Code')]/following::input[@role='combobox'])[2]")
     public WebElement newRegistrationCountryCodeOffice;
 
     @FindBy(id = "office-number")
@@ -102,13 +102,13 @@ public class Registration extends BasePage {
     @FindBy(id = "address")
     public WebElement newRegistrationAddress;
 
-    @FindBy(xpath = "//input[@id=':r9a:']")
+    @FindBy(xpath = "(//label[contains(., 'Country')]/following::input[@role='combobox'])[3]")
     public WebElement newRegistrationCountry;
 
-    @FindBy(xpath = "//input[@id=':r9d:']")
+    @FindBy(xpath = "//label[contains(., 'State')]/following::input[@role='combobox'][1]")
     public WebElement newRegistrationState;
 
-    @FindBy(xpath = "//input[@id=':r9g:']")
+    @FindBy(xpath = "//label[contains(., 'City')]/following::input[@role='combobox'][1]")
     public WebElement newRegistrationCity;
 
     @FindBy(id = "area-code")
@@ -204,6 +204,10 @@ public class Registration extends BasePage {
         if (!blood.isEmpty())
             BrowserUtils.selectFromDropdown(newRegistrationBloodGroup, blood);
 
+        String dob = patient.path("dob").asText();
+        if (!dob.isEmpty())
+            BrowserUtils.clearAndSendKeys(startDate, dob);
+
         String marital = patient.path("maritalStatus").asText();
         if (marital.isEmpty())
             marital = patient.path("maritialStatus").asText();
@@ -244,14 +248,16 @@ public class Registration extends BasePage {
 
         String ccMobile = patient.path("countryCode").asText();
         if (!ccMobile.isEmpty())
-            BrowserUtils.selectFromDropdown(newRegistrationCountryCodeMobile, ccMobile);
+            BrowserUtils.selectAutocompleteInput(newRegistrationCountryCodeMobile, ccMobile);
+            BrowserUtils.selectFirstOptionFromOpenDropdown();
         BrowserUtils.clearAndSendKeys(newRegistrationMobileNumber, patient.path("mobileNumber").asText());
 
         String ccOffice = patient.path("officeCountryCode").asText();
         if (ccOffice.isEmpty())
             ccOffice = patient.path("countryCodeOffice").asText();
         if (!ccOffice.isEmpty())
-            BrowserUtils.selectFromDropdown(newRegistrationCountryCodeOffice, ccOffice);
+            BrowserUtils.selectAutocompleteInput(newRegistrationCountryCodeOffice, ccOffice);
+            BrowserUtils.selectFirstOptionFromOpenDropdown();
 
         BrowserUtils.clearAndSendKeys(newRegistrationOfficeNumber, patient.path("officeNumber").asText());
 
@@ -266,7 +272,7 @@ public class Registration extends BasePage {
         String country = patient.path("country").asText();
         if (!country.isEmpty())
             BrowserUtils.selectAutocompleteInput(newRegistrationCountry, country);
-
+            BrowserUtils.selectFirstOptionFromOpenDropdown();
         BrowserUtils.waitUntilEnabled(() -> newRegistrationState, 15);
         BrowserUtils.click(newRegistrationState);
         BrowserUtils.selectFirstOptionFromOpenDropdown();
@@ -285,7 +291,7 @@ public class Registration extends BasePage {
 
     public void register() {
         BrowserUtils.click(registerButton);
-        BrowserUtils.waitForPageToLoad(10);
+        BrowserUtils.waitForPageToLoad(15);
     }
 
     public void confirmRegistrationYes() {
@@ -296,21 +302,23 @@ public class Registration extends BasePage {
     }
 
     public void verifySuccessLabel(String expectedText) {
-        boolean present = BrowserUtils.isTextPresent(expectedText, 15);
+        boolean present = BrowserUtils.isTextPresent(expectedText, 10);
         Assert.assertTrue("Success message not found: " + expectedText, present);
     }
 
     public void searchRegisteredPatientFromJsonAndVerify() {
-        String first = com.EMR.utilities.JsonUtils.getValue("registration", "patientInfo.firstName");
-        String last = com.EMR.utilities.JsonUtils.getValue("registration", "patientInfo.lastName");
-        String query = (first == null ? "" : first).trim();
+        JsonNode patientInfo = JsonUtils.getNestedNode("registration", "newRegistration", "patientInformation");
+        String first = patientInfo.path("firstName").asText();
+        String last = patientInfo.path("lastName").asText();
+        String fullName = (first + " " + last).trim();
+        
+        // Search using full name (first name + last name)
+        BrowserUtils.clearAndSendKeys(searchPatient, fullName);
+        BrowserUtils.waitFor(3); // Wait for search results to load after entering text
 
-        BrowserUtils.typeAndEnter(searchPatient, query);
-
-        // Verify either full name or last name appears in list view
-        boolean foundFull = BrowserUtils.isTextPresent((first + " " + last).trim(), 15);
-        boolean foundLast = BrowserUtils.isTextPresent(last, 5);
-        Assert.assertTrue("Registered patient not found in list", foundFull || foundLast);
+        // Verify full name appears in the Patient column of the table
+        boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, 5);
+        Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
     }
 
     // --- JSON-driven helpers (preferred) ---
@@ -326,38 +334,16 @@ public class Registration extends BasePage {
         fillPatientInformation(partner);
     }
 
-    // Build a JsonNode for person info (patient/partner) from testData.json using
-    // JsonUtils.getValue
+    // Build a JsonNode for person info (patient/partner) from testData.json using JsonUtils
     private JsonNode buildPersonNodeFromTestData(String personKey) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        com.fasterxml.jackson.databind.node.ObjectNode node = mapper.createObjectNode();
-
-        // Strings
-        node.put("prefix", JsonUtils.getValue("registration", personKey + ".prefix"));
-        node.put("firstName", JsonUtils.getValue("registration", personKey + ".firstName"));
-        node.put("middleName", JsonUtils.getValue("registration", personKey + ".middleName"));
-        node.put("lastName", JsonUtils.getValue("registration", personKey + ".lastName"));
-        node.put("sexAssignedAtBirth", JsonUtils.getValue("registration", personKey + ".sexAssignedAtBirth"));
-        node.put("bloodGroup", JsonUtils.getValue("registration", personKey + ".bloodGroup"));
-        node.put("maritalStatus", JsonUtils.getValue("registration", personKey + ".maritalStatus"));
-        node.put("idType", JsonUtils.getValue("registration", personKey + ".idType"));
-        node.put("id", JsonUtils.getValue("registration", personKey + ".id"));
-        node.put("referenceSource", JsonUtils.getValue("registration", personKey + ".referenceSource"));
-        node.put("additionalDetails", JsonUtils.getValue("registration", personKey + ".additionalDetails"));
-        node.put("occupationIndustry", JsonUtils.getValue("registration", personKey + ".occupationIndustry"));
-        node.put("reasonOfVisit", JsonUtils.getValue("registration", personKey + ".reasonOfVisit"));
-        node.put("ethnicity", JsonUtils.getValue("registration", personKey + ".ethnicity"));
-        node.put("preferredLanguage", JsonUtils.getValue("registration", personKey + ".preferredLanguage"));
-        node.put("countryCode", JsonUtils.getValue("registration", personKey + ".countryCode"));
-        node.put("mobileNumber", JsonUtils.getValue("registration", personKey + ".mobileNumber"));
-        node.put("officeCountryCode", JsonUtils.getValue("registration", personKey + ".officeCountryCode"));
-        node.put("officeNumber", JsonUtils.getValue("registration", personKey + ".officeNumber"));
-        node.put("email", JsonUtils.getValue("registration", personKey + ".email"));
-        node.put("address", JsonUtils.getValue("registration", personKey + ".address"));
-        node.put("country", JsonUtils.getValue("registration", personKey + ".country"));
-        node.put("areaCode", JsonUtils.getValue("registration", personKey + ".areaCode"));
-
-        return node;
+        // Get the nested node: registration.newRegistration.patientInformation (or partnerInformation)
+        JsonNode personNode = JsonUtils.getNestedNode("registration", "newRegistration", personKey);
+        
+        if (personNode == null || personNode.isMissingNode()) {
+            throw new IllegalStateException("Missing registration.newRegistration." + personKey + " in testData.json");
+        }
+        
+        return personNode;
     }
 
 }

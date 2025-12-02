@@ -3,7 +3,6 @@ package com.EMR.utilities;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.openqa.selenium.*;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -471,7 +470,7 @@ public class BrowserUtils {
 
     // Open a dropdown input and select the first available option (e.g., for State/City post-enablement)
     public static void selectFirstOptionFromOpenDropdown() {
-        By firstOption = By.xpath("(//ul//li[not(@aria-disabled='true')])[1]");
+        By firstOption = By.xpath("(//ul[@role='listbox']//li[not(@aria-disabled='true')])[1]");
         waitForVisibility(firstOption, 10).click();
     }
 
@@ -483,7 +482,7 @@ public class BrowserUtils {
 
     // Check if any element containing the given text is present within timeout
     public static boolean isTextPresent(String text, int timeoutSeconds) {
-        By by = By.xpath("//*[contains(normalize-space(.), '" + text + "')]");
+        By by = By.xpath("//div[contains(@class,'MuiAlert-message') and normalize-space()='" + text + "']");
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(by));
@@ -492,6 +491,22 @@ public class BrowserUtils {
             return false;
         }
     }
+
+    public static boolean isPatientPresentInTable(String text, int timeoutSeconds) {
+        By by = By.xpath("//table//tbody//tr/td[" +
+                        "count(//table//th[normalize-space()='Patient']/preceding-sibling::th) + 1 " +
+                        "and contains(normalize-space(.), '" + text + "')" +
+                        "]");
+
+        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
+        try {
+            wait.until(ExpectedConditions.presenceOfElementLocated(by));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }   
+
 
     /**
      * Execute a step with automatic try-catch handling, logging, and screenshot capture

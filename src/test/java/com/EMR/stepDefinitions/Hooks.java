@@ -1,5 +1,7 @@
 package com.EMR.stepDefinitions;
 
+import com.EMR.pages.LoginPage;
+import com.EMR.utilities.ConfigurationReader;
 import com.EMR.utilities.Driver;
 import com.EMR.utilities.ExtentReportManager;
 import io.cucumber.java.After;
@@ -7,12 +9,16 @@ import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.cucumber.java.Scenario;
+
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
 import java.time.Duration;
 
 public class Hooks {
+
+    private static boolean isLoggedIn = false;
+
     /**
      * One-time setup before all tests run
      * Initializes ExtentReports
@@ -31,9 +37,40 @@ public class Hooks {
         Driver.get().manage().window().maximize();
         Driver.get().manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 
+        // Set browser zoom to 75%
+        // JavascriptExecutor js = (JavascriptExecutor) Driver.get();
+        // js.executeScript("document.body.style.zoom = '75%';");
+
         // Initialize test in ExtentReports
         ExtentReportManager.createTest(scenario);
         ExtentReportManager.logStepInfo("Started scenario: " + scenario.getName());
+    }
+
+    /**
+     * Login once before the first @registration scenario
+     * Subsequent scenarios will reuse the same session
+     */
+    @Before(value = "@registration", order = 1)
+    public void loginOnce() {
+        if (!isLoggedIn) {
+            LoginPage loginPage = new LoginPage();
+
+            ExtentReportManager.logStepInfo("Performing one-time login for registration scenarios");
+            Driver.get().get(ConfigurationReader.get("url"));
+            loginPage.validLogin();
+            loginPage.loginButtonClick();
+
+            // Wait for successful login
+            try {
+                Thread.sleep(2000);
+                isLoggedIn = true;
+                ExtentReportManager.logStepPass("Login successful - session will be reused");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ExtentReportManager.logStepInfo("Reusing existing login session");
+        }
     }
 
     /**

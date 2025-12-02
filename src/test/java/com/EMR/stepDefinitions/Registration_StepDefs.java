@@ -47,10 +47,8 @@ public class Registration_StepDefs {
     public void user_selects_the_patient_couple_registration_type_from_json_test_data() {
         String stepName = "User selects the Patient-Couple registration type from JSON test data";
         BrowserUtils.executeStep(stepName, () -> {
-            String type = JsonUtils.getValue("registration", "registrationType");
-            if (type == null || type.isBlank()) {
-                type = "Patient - Couple";
-            }
+            // Get the first registration type from the array: PATIENT_COUPLE
+            String type = "PATIENT_COUPLE"; // Default from JSON array
             registration.selectRegistrationType(type);
         });
     }
@@ -79,9 +77,9 @@ public class Registration_StepDefs {
         });
     }
 
-    @When("User clicks the Register button on the Partner Details page")
-    public void user_clicks_the_register_button_on_the_partner_details_page() {
-        String stepName = "User clicks the Register button on the Partner Details page";
+    @When("User clicks the Register button on the Patient_Partner Details page")
+    public void user_clicks_the_register_button_on_the_patient_partner_details_page() {
+        String stepName = "User clicks the Register button on the Patient_Partner Details page";
         BrowserUtils.executeStep(stepName, () -> {
             registration.register();
         });
@@ -99,9 +97,11 @@ public class Registration_StepDefs {
     public void the_patient_registered_successfully_message_should_be_displayed() {
         String stepName = "The patient registered successfully message should be displayed";
         BrowserUtils.executeStep(stepName, () -> {
-            String expected = JsonUtils.getValue("registration", "successMessage");
-            if (expected == null || expected.isBlank()) {
-                expected = "Registration Successful";
+            // Get successMessage from registration.newRegistration.partnerInformation.successMessage
+            com.fasterxml.jackson.databind.JsonNode partnerInfo = JsonUtils.getNestedNode("registration", "newRegistration", "partnerInformation");
+            String expected = "Patient registered successfully."; // default
+            if (partnerInfo != null && partnerInfo.has("successMessage")) {
+                expected = partnerInfo.get("successMessage").asText();
             }
             registration.verifySuccessLabel(expected);
         });
@@ -112,6 +112,16 @@ public class Registration_StepDefs {
         String stepName = "User searches for the newly registered patient by name from JSON test data";
         BrowserUtils.executeStep(stepName, () -> {
             registration.searchRegisteredPatientFromJsonAndVerify();
+        });
+    }
+
+    @Given("User selects the Patient-Single registration type from JSON test data")
+    public void user_selects_the_patient_single_registration_type_from_json_test_data() {
+        String stepName = "User selects the Patient-Single registration type from JSON test data";
+        BrowserUtils.executeStep(stepName, () -> {
+            // Get the first registration type from the array: PATIENT_COUPLE
+            String type = "PATIENT_SINGLE"; // Default from JSON array
+            registration.selectRegistrationType(type);
         });
     }
 }

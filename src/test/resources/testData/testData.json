@@ -19,7 +19,6 @@
     "startDate": "2025-02-01",
     "endDate": "2025-03-10",
     "newRegistration": {
-      "newRegistrationPageURL": "https://staging-use1.vidaisolutions.com/admin/registration/patient-partner-registration",
       "registrationType": [
         "PATIENT_COUPLE",
         "PATIENT_SINGLE",
@@ -29,7 +28,7 @@
       ],
       "patientInformation": {
         "prefix": "Mr.",
-        "firstName": "John",
+        "firstName": "Yellow",
         "middleName": "A.",
         "lastName": "Doe",
         "sexAssignedAtBirth": "Male",
@@ -53,7 +52,8 @@
         "country": "United Kingdom",
         "state": "Trafford",
         "city": "Partington",
-        "areaCode": "90001"
+        "areaCode": "90001",
+        "failureMessage": "Please fill all the required fields"
       },
       "partnerInformation": {
         "prefix": "Mrs.",
@@ -81,7 +81,37 @@
         "country": "United Kingdom",
         "state": "Trafford",
         "city": "Partington",
-        "areaCode": "77001"
+        "areaCode": "77001",
+        "successMessage": "Patient registered successfully."
+      },
+      "patient-singleInformation": {
+        "prefix": "Mr.",
+        "firstName": "Test",
+        "middleName": "A.",
+        "lastName": "Doe",
+        "sexAssignedAtBirth": "Male",
+        "bloodGroup": "O+",
+        "dob": "10/11/1989",
+        "maritialStatus": "Married",
+        "idType": "Driving License",
+        "id": "D1234567",
+        "referenceSource": "Employee",
+        "additionalDetails": " Referred by a Employee",
+        "occupation/industry": "Engineering",
+        "reasonOfVisit": "Surgery",
+        "ethinicity": "White",
+        "prefferedLanguage": "English",
+        "countryCode": "232",
+        "mobileNumber": "5551234567",
+        "countryCodeOffice": "672",
+        "officeNumber": "5557654321",
+        "emailId": "john.doe@example.com",
+        "address": "123 Main St, Anytown, UK",
+        "country": "United Kingdom",
+        "state": "Trafford",
+        "city": "Partington",
+        "areaCode": "90001",
+        "failureMessage": "Please fill all the required fields"
       }
     }
   }
