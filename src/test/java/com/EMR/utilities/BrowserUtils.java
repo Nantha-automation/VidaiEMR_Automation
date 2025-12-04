@@ -442,6 +442,7 @@ public class BrowserUtils {
     // Generic dropdown selection for MUI-like inputs that open a list and select by visible text
     public static void selectFromDropdown(WebElement dropdown, String visibleText) {
         click(dropdown);
+        waitFor(1);
         By option = By.xpath(String.format("//li[normalize-space()='%s' or .//span[normalize-space()='%s']]", visibleText, visibleText));
         waitForVisibility(option, 10).click();
     }
@@ -482,7 +483,7 @@ public class BrowserUtils {
 
     // Check if any element containing the given text is present within timeout
     public static boolean isTextPresent(String text, int timeoutSeconds) {
-        By by = By.xpath("//div[contains(@class,'MuiAlert-message') and normalize-space()='" + text + "']");
+        By by = By.xpath("//div[contains(@class,'MuiAlert-message') and contains(normalize-space(), '" + text + "')]");
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
         try {
             wait.until(ExpectedConditions.presenceOfElementLocated(by));

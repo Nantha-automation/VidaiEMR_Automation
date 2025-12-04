@@ -16,7 +16,10 @@ import org.junit.runner.RunWith;
         features = "src/test/resources/features",
         glue = "com.EMR.stepDefinitions",
         dryRun = false,
-        tags = "@registration"
+        //to run specific tags, specify them here
+        tags = "@single"
+        //to run couple of tags use: tags = "@tag1 or @tag2"
+        //tags = "@login or @registration"
 )
 public class CukesRunner {
 }

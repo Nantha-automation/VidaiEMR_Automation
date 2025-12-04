@@ -1,9 +1,11 @@
 package com.EMR.stepDefinitions;
 
 import com.EMR.pages.LoginPage;
+import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.ConfigurationReader;
 import com.EMR.utilities.Driver;
 import com.EMR.utilities.ExtentReportManager;
+import com.EMR.utilities.ScenarioContext;
 import io.cucumber.java.After;
 import io.cucumber.java.AfterAll;
 import io.cucumber.java.Before;
@@ -34,6 +36,9 @@ public class Hooks {
      */
     @Before
     public void setUp(Scenario scenario) {
+        // Store scenario in context for use in step definitions
+        ScenarioContext.setScenario(scenario);
+        
         Driver.get().manage().window().maximize();
         Driver.get().manage().timeouts().implicitlyWait(Duration.ofSeconds(6));
 
@@ -57,6 +62,7 @@ public class Hooks {
 
             ExtentReportManager.logStepInfo("Performing one-time login for registration scenarios");
             Driver.get().get(ConfigurationReader.get("url"));
+            BrowserUtils.waitForPageToLoad(5);
             loginPage.validLogin();
             loginPage.loginButtonClick();
 
@@ -93,6 +99,9 @@ public class Hooks {
         } catch (Exception e) {
             ExtentReportManager.logStepWarning("Error during screenshot capture: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // Clear scenario from context after test completes
+            ScenarioContext.clearScenario();
         }
     }
 

@@ -1,12 +1,13 @@
 package com.EMR.pages;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-
+import io.cucumber.java.Scenario;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,7 +25,7 @@ public class Registration extends BasePage {
     @FindBy(id = "searchInput")
     public WebElement searchPatient;
 
-    @FindBy(id = "start-date")
+    @FindBy(xpath = "//*[@id='start-date' or @id='date-of-birth']")
     public WebElement startDate;
 
     @FindBy(id = "end-date")
@@ -42,13 +43,13 @@ public class Registration extends BasePage {
     @FindBy(id = "prefix-select")
     public WebElement newRegistrationPrefix;
 
-    @FindBy(id = "firstName")
+    @FindBy(xpath = "//label[contains(normalize-space(),'First Name')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationFirstName;
 
-    @FindBy(id = "middleName")
+    @FindBy(xpath = "//label[contains(normalize-space(),'Middle Name')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationMiddleName;
 
-    @FindBy(id = "lastName")
+    @FindBy(xpath = "//label[contains(normalize-space(),'Last Name')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationLastName;
 
     @FindBy(id = "sex-assigned-select")
@@ -57,49 +58,133 @@ public class Registration extends BasePage {
     @FindBy(id = "demo-simple-select")
     public WebElement newRegistrationBloodGroup;
 
-    @FindBy(id = "demo-simple-select-marital")
+    @FindBy(xpath = "//div[label[normalize-space()='Marital Status']]//div[@role='combobox']")
     public WebElement newRegistrationMaritalStatus;
 
-    @FindBy(id = "outlined-id-type")
-    public WebElement newRegistrationIdType;
+    @FindBy(xpath = "//label[contains(normalize-space(),'ID Type')]/following-sibling::div//div[@role='combobox']")
+    public WebElement newRegistrationIdType;  
 
-    @FindBy(id = "outlined-id")
+    @FindBy(xpath = "//label[contains(normalize-space(),'ID #')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationId;
 
-    @FindBy(id = "reference-source-select")
+    @FindBy(xpath = "//div[label[normalize-space()='Reference Source']]//div[@role='combobox']")
     public WebElement newRegistrationReferenceSource;
 
-    @FindBy(id = "additional-details")
+    @FindBy(xpath = "//label[contains(normalize-space(),'Additional Details')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationAdditionalDetails;
 
     @FindBy(id = "occupation-industry-autocomplete")
     public WebElement newRegistrationOccupationIndustry;
 
-    @FindBy(id = "reason-of-visit")
+    @FindBy(xpath = "//label[contains(normalize-space(),'Reason of Visit')]/following-sibling::div//input[@type='text']")
     public WebElement newRegistrationReasonOfVisit;
 
-    @FindBy(id = "ethnicity-select")
+    @FindBy(xpath = "//*[@id='ethnicity-select' or @id='outlined-select-ethnicity']")
     public WebElement newRegistrationEthnicity;
 
     @FindBy(id = "preferred-language-select")
     public WebElement newRegistrationPreferredLanguage;
 
-    @FindBy(xpath = "(//label[contains(., 'Country Code')]/following::input[@role='combobox'])[1]")
+    @FindBy(id = "body-type-select")
+    public WebElement newRegistrationbodyType;
+
+    @FindBy(id = "eye-color-select")
+    public WebElement newRegistrationEyeColor;
+
+    @FindBy(id = "handedness-select")
+    public WebElement newRegistrationHandedness;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Height')]/following::input[1]")
+    public WebElement newRegistrationHeight;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Weight')]/following::input[1]")
+    public WebElement newRegistrationWeight;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'BMI')]/following::input[1]")
+    public WebElement newRegistrationBMI;
+
+    @FindBy(id = "child-hair-color")
+    public WebElement newRegistrationChildHairColor;
+
+    @FindBy(id = "adult-hair-color")
+    public WebElement newRegistrationAdultHairColor;
+
+    @FindBy(id = "shade")
+    public WebElement newRegistrationShade;
+
+    @FindBy(id = "shade-type")
+    public WebElement newRegistrationShadeType;
+
+    @FindBy(id = "fullness")
+    public WebElement newRegistrationFullness;
+
+    @FindBy(id = "texture")
+    public WebElement newRegistrationTexture;
+
+    @FindBy(id = "Tone")
+    public WebElement newRegistrationTone;
+
+    @FindBy(id = "condition")
+    public WebElement newRegistrationCondition;
+
+    @FindBy(xpath = "//*[@id='acne' and @role='combobox' and ancestor::div[label[normalize-space()='Acne']]]")
+    public WebElement newRegistrationAcne;
+
+    @FindBy(id = "age-acne-occurred")
+    public WebElement newRegistrationAgeAcneOccurred;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Treatment Required']]//input[@type='checkbox']")
+    public WebElement newRegistrationTreatmentRequired;
+
+    @FindBy(id = "skin-condition")
+    public WebElement newRegistrationMole;
+
+    @FindBy(xpath = "//*[@id='acne' and @role='combobox' and ancestor::div[label[normalize-space()='Freckles']]]")
+    public WebElement newRegistrationFreckles;
+
+    @FindBy(id = "acne-severity")
+    public WebElement newRegistrationDimples;
+
+    @FindBy(id = "vision-select")
+    public WebElement newRegistrationVision;
+
+    @FindBy(xpath = "//label[normalize-space()='Correction']/following-sibling::div//div[@role='combobox']")
+    public WebElement newRegistrationCorrection;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Age when prescribed']]//input[@type='text']")
+    public WebElement newRegistrationAgeWhenPrescribed;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Any Hearing Difficulties']]//input[@type='checkbox']")
+    public WebElement newRegistrationHearingDifficulties;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Describe difficulty']]//input[@type='text']")
+    public WebElement newRegistrationDescribeDifficulty;
+
+    @FindBy(xpath = "//label[normalize-space()='Devices']/following-sibling::div//div[@role='combobox']")
+    public WebElement newRegistrationDevices;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Reason for Devices')]/following-sibling::div//div[@role='combobox']")
+    public WebElement newRegistrationReasonForDevices;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Ages Used']]//input[@type='text']")
+    public WebElement newRegistrationAgesUsed;
+
+    @FindBy(xpath = "(//label[contains(normalize-space(),'Country Code')]/following-sibling::div//input[@type='text'])[1]")
     public WebElement newRegistrationCountryCodeMobile;
 
     @FindBy(id = "mobile-number")
     public WebElement newRegistrationMobileNumber;
 
-    @FindBy(xpath = "(//label[contains(., 'Country Code')]/following::input[@role='combobox'])[2]")
+    @FindBy(xpath = "(//label[contains(normalize-space(),'Country Code')]/following-sibling::div//input[@type='text'])[2]")
     public WebElement newRegistrationCountryCodeOffice;
 
-    @FindBy(id = "office-number")
+    @FindBy(xpath = "//*[@id='office-number' or @id='alternate-mobile']")
     public WebElement newRegistrationOfficeNumber;
 
     @FindBy(id = "email-id")
     public WebElement newRegistrationEmailId;
 
-    @FindBy(id = "address")
+    @FindBy(xpath = "(//input[@id='address']) | (//label[contains(normalize-space(),'Address Line 1') or contains(normalize-space(),'Address')]/following-sibling::div//input[@type='text'])")
     public WebElement newRegistrationAddress;
 
     @FindBy(xpath = "(//label[contains(., 'Country')]/following::input[@role='combobox'])[3]")
@@ -111,8 +196,32 @@ public class Registration extends BasePage {
     @FindBy(xpath = "//label[contains(., 'City')]/following::input[@role='combobox'][1]")
     public WebElement newRegistrationCity;
 
-    @FindBy(id = "area-code")
+    @FindBy(xpath = "//label[contains(normalize-space(),'Area Code')]/following-sibling::div//input[@type='text']")
     public WebElement newRegistrationAreaCode;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Ever Applied/Screened to be Sperm Donor']]//input[@type='checkbox']")
+    public WebElement newRegistrationEverAppliedScreenedToBeSpermDonor;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Donated Sperm']]//input[@type='checkbox']")
+    public WebElement newRegistrationDonatedSperm;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Donor Program Name']]//input[@type='text']")
+    public WebElement newRegistrationDonorProgramName;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Donation Count']]//input[@type='text']")
+    public WebElement newRegistrationDonationCount;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Donation Cycle']]//input[@type='text']")
+    public WebElement newRegistrationDonationCycle;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Ever Applied/Screened to be an Egg Donor']]//input[@type='checkbox']")
+    public WebElement newRegistrationEverAppliedScreenedToBeEggDonor;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Donated Egg']]//input[@type='checkbox']")
+    public WebElement newRegistrationDonatedEgg;
+
+    @FindBy(xpath = "//div[label[normalize-space()='Consulted with your family when completing family medical history']]//input[@type='checkbox']")
+    public WebElement newRegistrationConsultedWithYourFamilyWhenCompletingFamilyMedicalHistory;
 
     @FindBy(xpath = "//button[normalize-space()='Cancel']")
     public WebElement newRegistrationCancelButton;
@@ -123,12 +232,64 @@ public class Registration extends BasePage {
     @FindBy(xpath = "//button[normalize-space()='Register']")
     public WebElement registerButton;
 
+    @FindBy(xpath = "//label[normalize-space()='Exit Patient']/ancestor::div[contains(@class,'sidebarComponent_userCard')]")
+    public WebElement exitPatient;
+
     public void clickRegistrationMenu() {
         BrowserUtils.click(registrationMenu);
     }
 
+    public void clickExitPatient() {
+        BrowserUtils.click(exitPatient);
+        BrowserUtils.waitForPageToLoad(15);
+    }
+
     public void selectSearchByOption(String value) {
         BrowserUtils.selectRadioByValue(searchByRadios, value);
+    }
+
+    
+    /**
+     * Selects the appropriate SearchBy radio button based on the scenario tag.
+     * Extracts the type tag from scenario (e.g., @patient, @sperm_donor) and matches it 
+     * with the corresponding value in the searchBy array from JSON test data.
+     * 
+     * @param scenario The Cucumber scenario containing tags
+     * @throws AssertionError if no matching searchBy value found for the tag
+     */
+    public void selectSearchByRadioOptionUsingTag(Scenario scenario) {
+        // 1. Find the "type tag" from scenario (e.g. @patient, @sperm_donor)
+        List<String> genericTags = Arrays.asList("@register", "@registration", "@regression", "@smoke");
+        String typeTag = scenario.getSourceTagNames().stream()
+                .map(String::toLowerCase)
+                .filter(t -> !genericTags.contains(t)) // ignore generic tags
+                .findFirst()
+                .orElse("")
+                .replace("@", "") // "@sperm_donor" -> "sperm_donor"
+                .toUpperCase(); // "sperm_donor" -> "SPERM_DONOR"
+
+        // Handle empty tag case
+        if (typeTag.isEmpty()) {
+            throw new AssertionError("No type-specific tag found in scenario. Expected tags like @patient, @sperm_donor, @oocyte_donor, or @surrogate");
+        }
+
+        // 2. Match with JSON array: "searchBy": ["patient","SPERM_DONOR","OOCYTE_DONOR","SURROGATE"]
+        List<String> searchByArray = JsonUtils.getArrayValues("registration", "searchBy");
+        String matchedValue = "";
+        for (String value : searchByArray) {
+            if (value.equalsIgnoreCase(typeTag)) {
+                matchedValue = value;
+                break;
+            }
+        }
+
+        if (matchedValue.isEmpty()) {
+            throw new AssertionError("No matching searchBy value found in JSON for tag: @" + typeTag.toLowerCase() + 
+                    ". Available values in JSON: " + searchByArray);
+        }
+
+        // 3. Reuse your existing method
+        selectSearchByOption(matchedValue);
     }
 
     public List<String> getSearchByValues() {
@@ -160,6 +321,7 @@ public class Registration extends BasePage {
     }
 
     public void selectRegistrationType(String type) {
+        BrowserUtils.waitForPageToLoad(10);
         // Map internal values to visible labels
         String label;
         switch (type.toUpperCase()) {
@@ -181,9 +343,9 @@ public class Registration extends BasePage {
             default:
                 label = type;
         }
-        WebElement radioLabel = Driver.get().findElement(
-                By.xpath("//label[normalize-space()='%s']|//span[normalize-space()='%s']".formatted(label, label)));
-        BrowserUtils.click(radioLabel);
+        // Use XPath to click with retry mechanism to handle stale elements
+        String xpath = "//label[normalize-space()='%s']|//span[normalize-space()='%s']".formatted(label, label);
+        BrowserUtils.clickWithWait(By.xpath(xpath), 3);
     }
 
     public void fillPatientInformation(JsonNode patient) {
@@ -284,6 +446,136 @@ public class Registration extends BasePage {
         BrowserUtils.clearAndSendKeys(newRegistrationAreaCode, patient.path("areaCode").asText());
     }
 
+    public void commonFieldsforSpermAndEggDonor(JsonNode patient) {
+        String bodyType = patient.path("bodyType").asText();
+        if (bodyType.isEmpty())
+            bodyType = patient.path("bodyType").asText();
+        if (!bodyType.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationbodyType, bodyType);
+
+        String eyeColor = patient.path("eyeColor").asText();
+        if (eyeColor.isEmpty())
+            eyeColor = patient.path("eyeColor").asText();
+        if (!eyeColor.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationEyeColor, eyeColor);
+
+        String handedness = patient.path("handedness").asText();
+        if (handedness.isEmpty())
+            handedness = patient.path("handedness").asText();
+        if (!handedness.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationHandedness, handedness);
+
+        BrowserUtils.clearAndSendKeys(newRegistrationHeight, patient.path("height").asText());
+        BrowserUtils.clearAndSendKeys(newRegistrationWeight, patient.path("weight").asText());
+        
+        String hairColorChild = patient.path("childHairColor").asText();
+        if (!hairColorChild.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationChildHairColor, hairColorChild);
+        
+        String hairColorAdult = patient.path("adultHairColor").asText();
+        if (!hairColorAdult.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationAdultHairColor, hairColorAdult);
+
+        String shade = patient.path("shade").asText();
+        if (!shade.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationShade, shade);
+
+        String shadeType = patient.path("shadeType").asText();
+        if (!shadeType.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationShadeType, shadeType);
+
+        String fullness = patient.path("fullness").asText();
+        if (!fullness.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationFullness, fullness);
+
+        String texture = patient.path("texture").asText();
+        if (!texture.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationTexture, texture);
+
+        String tone = patient.path("tone").asText();
+        if (!tone.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationTone, tone);
+
+        String condition = patient.path("condition").asText();
+        if (!condition.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationCondition, condition);
+
+        String acne = patient.path("acne").asText();
+        if (!acne.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationAcne, acne);
+
+        BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeAcneOccurred, 15);
+        BrowserUtils.clearAndSendKeys(newRegistrationAgeAcneOccurred, patient.path("ageWhenAcneOccurred").asText());
+
+        BrowserUtils.selectCheckBox(newRegistrationTreatmentRequired,patient.path("treatmentRequired").asBoolean());
+
+        String mole = patient.path("mole").asText();
+        if (!mole.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationMole, mole);
+
+        String freckles = patient.path("freckles").asText();
+        if (!freckles.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationFreckles, freckles); 
+
+        String dimples = patient.path("dimples").asText();
+        if (!dimples.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationDimples, dimples);
+
+        String vision = patient.path("vision").asText();
+        if (!vision.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationVision, vision);
+
+        String correction = patient.path("correction").asText();
+        if (!correction.isEmpty())
+            BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeAcneOccurred, 15);
+            BrowserUtils.selectFromDropdown(newRegistrationCorrection, correction);
+
+        BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeWhenPrescribed, 15);
+        BrowserUtils.clearAndSendKeys(newRegistrationAgeWhenPrescribed, patient.path("ageWhenPrescribed").asText());
+
+        BrowserUtils.selectCheckBox(newRegistrationHearingDifficulties, patient.path("anyHearingDifficulties").asBoolean());
+
+        BrowserUtils.waitUntilEnabled(() -> newRegistrationDescribeDifficulty, 15);
+        BrowserUtils.clearAndSendKeys(newRegistrationDescribeDifficulty, patient.path("describeDifficulty").asText());
+
+        String devices = patient.path("devices").asText();
+        if (!devices.isEmpty())
+            BrowserUtils.selectFromDropdown(newRegistrationDevices, devices);
+
+        String reasonForDevices = patient.path("reasonForDevices").asText();
+        if (!reasonForDevices.isEmpty())
+            BrowserUtils.waitUntilEnabled(() -> newRegistrationReasonForDevices, 15);
+            BrowserUtils.selectFromDropdown(newRegistrationReasonForDevices, reasonForDevices);
+
+        BrowserUtils.clearAndSendKeys(newRegistrationAgesUsed, patient.path("agesUsed").asText());
+
+        BrowserUtils.clearAndSendKeys(newRegistrationDonorProgramName, patient.path("donorProgramName").asText());
+
+        BrowserUtils.selectCheckBox(newRegistrationConsultedWithYourFamilyWhenCompletingFamilyMedicalHistory, patient.path("consultedWithYourFamily").asBoolean());
+    }
+
+    public void fillSperm_donorInformation(JsonNode patient) {
+        fillPatientInformation(patient);
+        commonFieldsforSpermAndEggDonor(patient);
+
+        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeSpermDonor, patient.path("everAppliedScreenedToBeSpermDonor").asBoolean());
+
+        BrowserUtils.selectCheckBox(newRegistrationDonatedSperm, patient.path("donatedSperm").asBoolean());
+
+        BrowserUtils.clearAndSendKeys(newRegistrationDonationCount, patient.path("donationCount").asText());
+    }
+
+    public void fillEgg_donorInformation(JsonNode patient) {
+        fillPatientInformation(patient);
+        commonFieldsforSpermAndEggDonor(patient);
+
+        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeEggDonor, patient.path("everAppliedScreenedToBeEggDonor").asBoolean());
+
+        BrowserUtils.selectCheckBox(newRegistrationDonatedEgg, patient.path("donatedEgg").asBoolean());
+
+        BrowserUtils.clearAndSendKeys(newRegistrationDonationCycle, patient.path("donationCycle").asText());
+    }
+
     public void saveAndNext() {
         BrowserUtils.click(newRegistrationSaveAndNextButton);
         BrowserUtils.waitForPageToLoad(10);
@@ -306,20 +598,25 @@ public class Registration extends BasePage {
         Assert.assertTrue("Success message not found: " + expectedText, present);
     }
 
-    public void searchRegisteredPatientFromJsonAndVerify() {
-        JsonNode patientInfo = JsonUtils.getNestedNode("registration", "newRegistration", "patientInformation");
-        String first = patientInfo.path("firstName").asText();
-        String last = patientInfo.path("lastName").asText();
-        String fullName = (first + " " + last).trim();
-        
-        // Search using full name (first name + last name)
-        BrowserUtils.clearAndSendKeys(searchPatient, fullName);
-        BrowserUtils.waitFor(3); // Wait for search results to load after entering text
+    public void searchRegisteredPatientFromJsonAndVerify(String infoKey) {
+    // infoKey = "patientInformation" / "spermDonorInformation" / "oocyteDonorInformation" / "surrogateInformation"
 
-        // Verify full name appears in the Patient column of the table
-        boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, 5);
-        Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
+    JsonNode patientInfo = JsonUtils.getNestedNode("registration", "newRegistration", infoKey);
+    if (patientInfo == null || patientInfo.isMissingNode()) {
+        throw new IllegalStateException("No JSON node found for path registration.newRegistration." + infoKey);
     }
+
+    String first = patientInfo.path("firstName").asText();
+    String last  = patientInfo.path("lastName").asText();
+    String fullName = (first + " " + last).trim();
+    // Search using full name (first name + last name)
+    BrowserUtils.clearAndSendKeys(searchPatient, fullName);
+    BrowserUtils.waitFor(3);
+    // Verify full name appears in the Patient column of the table
+    boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, 5);
+    Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
+}
+
 
     // --- JSON-driven helpers (preferred) ---
     // Populate Patient information directly from testData.json using JsonUtils
@@ -328,10 +625,30 @@ public class Registration extends BasePage {
         fillPatientInformation(patient);
     }
 
-    // Populate Partner information directly from testData.json using JsonUtils
+   // Populate Partner information directly from testData.json using JsonUtils
     public void fillPartnerInformationFromJson() {
         JsonNode partner = buildPersonNodeFromTestData("partnerInformation");
         fillPatientInformation(partner);
+    }
+
+    public void fillPatientSingleInformationFromJson() {
+        JsonNode patient = buildPersonNodeFromTestData("patient-singleInformation");
+        fillPatientInformation(patient);
+    }
+
+    public void fillSpermDonorInformationFromJson() {
+        JsonNode patient = buildPersonNodeFromTestData("sperm_donorInformation");
+        fillSperm_donorInformation(patient);
+    }
+
+    public void fillEggDonorInformationFromJson() {
+        JsonNode patient = buildPersonNodeFromTestData("egg_donorInformation");
+        fillEgg_donorInformation(patient);
+    }
+
+    public void fillSurrogateInformationFromJson() {
+        JsonNode patient = buildPersonNodeFromTestData("surrogateInformation");
+        fillEgg_donorInformation(patient);
     }
 
     // Build a JsonNode for person info (patient/partner) from testData.json using JsonUtils
