@@ -8,7 +8,7 @@
     "password": "wrong123"
   },
   "registration": {
-    "registrationPageUrl": "https://staging-use1.vidaisolutions.com/admin/registration",
+    "registrationPageUrl": "https://staging-use1.vidaisolutions.com/admin/registration/patient-list",
     "searchBy": [
       "patient",
       "SPERM_DONOR",
@@ -294,6 +294,13 @@
         "city": "Partington",
         "areaCode": "90001",
         "successMessage": "Surrogate registered successfully."
+      },
+      "delinkPartner": {
+        "delinkReason": "No longer needed",
+        "remark": "Patient requested delinking."
+      },
+      "modifyPatient": {
+        "newReasonOfVisit": "Radiology"
       }
     }
   }

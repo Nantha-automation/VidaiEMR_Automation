@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 public class BrowserUtils {
     /*
      * takes screenshot
+     * 
      * @param name
      * take a name of a test and returns a path to screenshot takes
      */
@@ -30,7 +31,7 @@ public class BrowserUtils {
         TakesScreenshot ts = (TakesScreenshot) Driver.get();
 
         File source = ts.getScreenshotAs(OutputType.FILE);
-        //   ((TakesScreenshot)Driver.get()).getScreenshotAs(OutputType.FILE);
+        // ((TakesScreenshot)Driver.get()).getScreenshotAs(OutputType.FILE);
         // full path to the screenshot location
         String target = System.getProperty("user.dir") + "/test-output/Screenshots/" + name + date + ".png";
         File finalDestination = new File(target);
@@ -40,7 +41,9 @@ public class BrowserUtils {
     }
 
     /**
-     * Switches to new window by the exact title. Returns to original window if target title not found
+     * Switches to new window by the exact title. Returns to original window if
+     * target title not found
+     * 
      * @param targetTitle
      */
     public static void switchToWindow(String targetTitle) {
@@ -79,7 +82,8 @@ public class BrowserUtils {
     }
 
     /**
-     * Extracts text from list of elements matching the provided locator into new List<String>
+     * Extracts text from list of elements matching the provided locator into new
+     * List<String>
      *
      * @return list of strings
      */
@@ -108,15 +112,15 @@ public class BrowserUtils {
     }
 
     public static void click(WebElement element) {
-    try {
-        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.elementToBeClickable(element)).click();
-    } catch (Exception e) {
-        // Fallback: JS Click
-        JavascriptExecutor js = (JavascriptExecutor) Driver.get();
-        js.executeScript("arguments[0].click();", element);
+        try {
+            WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(10));
+            wait.until(ExpectedConditions.elementToBeClickable(element)).click();
+        } catch (Exception e) {
+            // Fallback: JS Click
+            JavascriptExecutor js = (JavascriptExecutor) Driver.get();
+            js.executeScript("arguments[0].click();", element);
+        }
     }
-}
 
     /**
      * Waits for the provided element to be visible on the page
@@ -138,7 +142,7 @@ public class BrowserUtils {
      * @return
      */
     public static WebElement waitForVisibility(By locator, int timeout) {
-        //WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
+        // WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(20));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
@@ -151,7 +155,7 @@ public class BrowserUtils {
      * @return
      */
     public static WebElement waitForClickablility(WebElement element, int timeout) {
-        //WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
+        // WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(20));
         return wait.until(ExpectedConditions.elementToBeClickable(element));
     }
@@ -164,7 +168,7 @@ public class BrowserUtils {
      * @return
      */
     public static WebElement waitForClickablility(By locator, int timeout) {
-        //WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
+        // WebDriverWait wait = new WebDriverWait(Driver.get(), timeout);
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(20));
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
@@ -182,7 +186,7 @@ public class BrowserUtils {
         };
         try {
             WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(20));
-            //WebDriverWait wait = new WebDriverWait(Driver.get(), timeOutInSeconds);
+            // WebDriverWait wait = new WebDriverWait(Driver.get(), timeOutInSeconds);
             wait.until(expectation);
         } catch (Throwable error) {
             error.printStackTrace();
@@ -190,10 +194,12 @@ public class BrowserUtils {
     }
 
     /**
-     * Verifies whether the element matching the provided locator is displayed on page
+     * Verifies whether the element matching the provided locator is displayed on
+     * page
      *
      * @param by
-     * @throws AssertionError if the element matching the provided locator is not found or not displayed
+     * @throws AssertionError if the element matching the provided locator is not
+     *                        found or not displayed
      */
     public static void verifyElementDisplayed(By by) {
         try {
@@ -206,7 +212,8 @@ public class BrowserUtils {
     }
 
     /**
-     * Verifies whether the element matching the provided locator is NOT displayed on page
+     * Verifies whether the element matching the provided locator is NOT displayed
+     * on page
      *
      * @param by
      * @throws AssertionError the element matching the provided locator is displayed
@@ -219,7 +226,6 @@ public class BrowserUtils {
 
         }
     }
-
 
     /**
      * Verifies whether the element is displayed on page
@@ -236,7 +242,6 @@ public class BrowserUtils {
 
         }
     }
-
 
     /**
      * Waits for element to be not stale
@@ -268,7 +273,6 @@ public class BrowserUtils {
         }
     }
 
-
     /**
      * Clicks on an element using JavaScript
      *
@@ -278,7 +282,6 @@ public class BrowserUtils {
         ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].scrollIntoView(true);", element);
         ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].click();", element);
     }
-
 
     /**
      * Scrolls down to an element using JavaScript
@@ -299,24 +302,29 @@ public class BrowserUtils {
     }
 
     /**
-     * Changes the HTML attribute of a Web Element to the given value using JavaScript
+     * Changes the HTML attribute of a Web Element to the given value using
+     * JavaScript
      *
      * @param element
      * @param attributeName
      * @param attributeValue
      */
     public static void setAttribute(WebElement element, String attributeName, String attributeValue) {
-        ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);", element, attributeName, attributeValue);
+        ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].setAttribute(arguments[1], arguments[2]);",
+                element, attributeName, attributeValue);
     }
 
     /**
      * Highlighs an element by changing its background and border color
+     * 
      * @param element
      */
     public static void highlight(WebElement element) {
-        ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');", element);
+        ((JavascriptExecutor) Driver.get()).executeScript(
+                "arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');", element);
         waitFor(1);
-        ((JavascriptExecutor) Driver.get()).executeScript("arguments[0].removeAttribute('style', 'background: yellow; border: 2px solid red;');", element);
+        ((JavascriptExecutor) Driver.get()).executeScript(
+                "arguments[0].removeAttribute('style', 'background: yellow; border: 2px solid red;');", element);
     }
 
     /**
@@ -376,7 +384,6 @@ public class BrowserUtils {
 
     }
 
-
     /**
      * This method will recover in case of exception after unsuccessful the click,
      * and will try to click on element again.
@@ -386,34 +393,36 @@ public class BrowserUtils {
      */
     public static void clickWithWait(By by, int attempts) {
         int counter = 0;
-        //click on element as many as you specified in attempts parameter
+        // click on element as many as you specified in attempts parameter
         while (counter < attempts) {
             try {
-                //selenium must look for element again
+                // selenium must look for element again
                 clickWithJS(Driver.get().findElement(by));
-                //if click is successful - then break
+                // if click is successful - then break
                 break;
             } catch (WebDriverException e) {
-                //if click failed
-                //print exception
-                //print attempt
+                // if click failed
+                // print exception
+                // print attempt
                 e.printStackTrace();
                 ++counter;
-                //wait for 1 second, and try to click again
+                // wait for 1 second, and try to click again
                 waitFor(1);
             }
         }
     }
 
     /**
-     *  checks that an element is present on the DOM of a page. This does not
-     *    * necessarily mean that the element is visible.
+     * checks that an element is present on the DOM of a page. This does not
+     * * necessarily mean that the element is visible.
+     * 
      * @param by
      * @param time
      */
     public static void waitForPresenceOfElement(By by, long time) {
-        //new WebDriverWait(Driver.get(), time).until(ExpectedConditions.presenceOfElementLocated(by));
-        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(20));
+        // new WebDriverWait(Driver.get(),
+        // time).until(ExpectedConditions.presenceOfElementLocated(by));
+        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(time));
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
@@ -439,22 +448,27 @@ public class BrowserUtils {
         dateField.sendKeys(dateValue);
     }
 
-    // Generic dropdown selection for MUI-like inputs that open a list and select by visible text
+    // Generic dropdown selection for MUI-like inputs that open a list and select by
+    // visible text
     public static void selectFromDropdown(WebElement dropdown, String visibleText) {
         click(dropdown);
         waitFor(1);
-        By option = By.xpath(String.format("//li[normalize-space()='%s' or .//span[normalize-space()='%s']]", visibleText, visibleText));
+        By option = By.xpath(String.format("//li[normalize-space()='%s' or .//span[normalize-space()='%s']]",
+                visibleText, visibleText));
         waitForVisibility(option, 10).click();
     }
 
-    // Wait until element is enabled/interactive using supplier to re-query element if needed
+    // Wait until element is enabled/interactive using supplier to re-query element
+    // if needed
     public static void waitUntilEnabled(Supplier<WebElement> elementSupplier, int timeoutSeconds) {
         long end = System.currentTimeMillis() + timeoutSeconds * 1000L;
         while (System.currentTimeMillis() < end) {
             try {
                 WebElement el = elementSupplier.get();
-                if (el.isEnabled()) return;
-            } catch (StaleElementReferenceException ignored) {}
+                if (el.isEnabled())
+                    return;
+            } catch (StaleElementReferenceException ignored) {
+            }
             waitFor(1);
         }
         throw new TimeoutException("Element was not enabled within timeout");
@@ -463,13 +477,17 @@ public class BrowserUtils {
     // For inputs with autocomplete behavior: type text and press ENTER to select
     public static void selectAutocompleteInput(WebElement input, String text) {
         input.click();
-        try { input.clear(); } catch (Exception ignored) {}
+        try {
+            input.clear();
+        } catch (Exception ignored) {
+        }
         input.sendKeys(text);
         waitFor(1);
         input.sendKeys(Keys.ENTER);
     }
 
-    // Open a dropdown input and select the first available option (e.g., for State/City post-enablement)
+    // Open a dropdown input and select the first available option (e.g., for
+    // State/City post-enablement)
     public static void selectFirstOptionFromOpenDropdown() {
         By firstOption = By.xpath("(//ul[@role='listbox']//li[not(@aria-disabled='true')])[1]");
         waitForVisibility(firstOption, 10).click();
@@ -495,9 +513,9 @@ public class BrowserUtils {
 
     public static boolean isPatientPresentInTable(String text, int timeoutSeconds) {
         By by = By.xpath("//table//tbody//tr/td[" +
-                        "count(//table//th[normalize-space()='Patient']/preceding-sibling::th) + 1 " +
-                        "and contains(normalize-space(.), '" + text + "')" +
-                        "]");
+                "count(//table//th[normalize-space()='Patient']/preceding-sibling::th) + 1 " +
+                "and contains(normalize-space(.), '" + text + "')" +
+                "]");
 
         WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
         try {
@@ -506,11 +524,11 @@ public class BrowserUtils {
         } catch (Exception e) {
             return false;
         }
-    }   
-
+    }
 
     /**
-     * Execute a step with automatic try-catch handling, logging, and screenshot capture
+     * Execute a step with automatic try-catch handling, logging, and screenshot
+     * capture
      * Reduces code duplication for step definitions
      *
      * @param stepName The name of the step for logging
@@ -519,7 +537,8 @@ public class BrowserUtils {
     public static void executeStep(String stepName, StepExecutor executor) {
         try {
             executor.execute();
-            // On pass, only log pass without screenshot (final screenshot is added at scenario end)
+            // On pass, only log pass without screenshot (final screenshot is added at
+            // scenario end)
             ExtentReportManager.logStepPass(stepName);
         } catch (AssertionError e) {
             ExtentReportManager.logStepFailWithScreenshot(stepName + " - " + e.getMessage(), stepName);

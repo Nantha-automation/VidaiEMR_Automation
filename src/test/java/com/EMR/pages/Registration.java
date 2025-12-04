@@ -1,5 +1,6 @@
 package com.EMR.pages;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,6 +8,9 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import io.cucumber.java.Scenario;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.JsonUtils;
@@ -62,7 +66,7 @@ public class Registration extends BasePage {
     public WebElement newRegistrationMaritalStatus;
 
     @FindBy(xpath = "//label[contains(normalize-space(),'ID Type')]/following-sibling::div//div[@role='combobox']")
-    public WebElement newRegistrationIdType;  
+    public WebElement newRegistrationIdType;
 
     @FindBy(xpath = "//label[contains(normalize-space(),'ID #')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
     public WebElement newRegistrationId;
@@ -230,10 +234,36 @@ public class Registration extends BasePage {
     public WebElement newRegistrationSaveAndNextButton;
 
     @FindBy(xpath = "//button[normalize-space()='Register']")
-    public WebElement registerButton;
+    public WebElement newRegistrationRegisterButton;
 
     @FindBy(xpath = "//label[normalize-space()='Exit Patient']/ancestor::div[contains(@class,'sidebarComponent_userCard')]")
     public WebElement exitPatient;
+
+    @FindBy(xpath = "//input[@type='text' and @name='name' and @placeholder='Search by name, MRN']")
+    public WebElement linkPartnerSearchBox;
+
+    @FindBy(xpath = "//table//tbody//tr//td//input[@type='radio' and @name='partner']")
+    public WebElement linkPartnerRadioButton;
+
+    @FindBy(xpath = "//button[normalize-space()='Link Partner']")
+    public WebElement linkPartnerButton;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Delink Reason')]/following::input[@type='text']")
+    public WebElement delinkReasonInput;
+
+    @FindBy(xpath = "//label[normalize-space()='Remark']/following-sibling::textarea")
+    public WebElement remarkTextarea;
+
+    @FindBy(xpath = "//button[normalize-space()='Delink Partner']")
+    public WebElement delinkPartnerButton;
+
+    @FindBy(xpath = "//img[@alt='Edit Icon']")
+    public WebElement editIcon;
+
+    @FindBy(xpath = "//button[normalize-space()='Update Patient']")
+    public WebElement updatePatientButton;
+
+    private String fullName;
 
     public void clickRegistrationMenu() {
         BrowserUtils.click(registrationMenu);
@@ -248,10 +278,10 @@ public class Registration extends BasePage {
         BrowserUtils.selectRadioByValue(searchByRadios, value);
     }
 
-    
     /**
      * Selects the appropriate SearchBy radio button based on the scenario tag.
-     * Extracts the type tag from scenario (e.g., @patient, @sperm_donor) and matches it 
+     * Extracts the type tag from scenario (e.g., @patient, @sperm_donor) and
+     * matches it
      * with the corresponding value in the searchBy array from JSON test data.
      * 
      * @param scenario The Cucumber scenario containing tags
@@ -270,10 +300,12 @@ public class Registration extends BasePage {
 
         // Handle empty tag case
         if (typeTag.isEmpty()) {
-            throw new AssertionError("No type-specific tag found in scenario. Expected tags like @patient, @sperm_donor, @oocyte_donor, or @surrogate");
+            throw new AssertionError(
+                    "No type-specific tag found in scenario. Expected tags like @patient, @sperm_donor, @oocyte_donor, or @surrogate");
         }
 
-        // 2. Match with JSON array: "searchBy": ["patient","SPERM_DONOR","OOCYTE_DONOR","SURROGATE"]
+        // 2. Match with JSON array: "searchBy":
+        // ["patient","SPERM_DONOR","OOCYTE_DONOR","SURROGATE"]
         List<String> searchByArray = JsonUtils.getArrayValues("registration", "searchBy");
         String matchedValue = "";
         for (String value : searchByArray) {
@@ -284,7 +316,7 @@ public class Registration extends BasePage {
         }
 
         if (matchedValue.isEmpty()) {
-            throw new AssertionError("No matching searchBy value found in JSON for tag: @" + typeTag.toLowerCase() + 
+            throw new AssertionError("No matching searchBy value found in JSON for tag: @" + typeTag.toLowerCase() +
                     ". Available values in JSON: " + searchByArray);
         }
 
@@ -411,7 +443,7 @@ public class Registration extends BasePage {
         String ccMobile = patient.path("countryCode").asText();
         if (!ccMobile.isEmpty())
             BrowserUtils.selectAutocompleteInput(newRegistrationCountryCodeMobile, ccMobile);
-            BrowserUtils.selectFirstOptionFromOpenDropdown();
+        BrowserUtils.selectFirstOptionFromOpenDropdown();
         BrowserUtils.clearAndSendKeys(newRegistrationMobileNumber, patient.path("mobileNumber").asText());
 
         String ccOffice = patient.path("officeCountryCode").asText();
@@ -419,7 +451,7 @@ public class Registration extends BasePage {
             ccOffice = patient.path("countryCodeOffice").asText();
         if (!ccOffice.isEmpty())
             BrowserUtils.selectAutocompleteInput(newRegistrationCountryCodeOffice, ccOffice);
-            BrowserUtils.selectFirstOptionFromOpenDropdown();
+        BrowserUtils.selectFirstOptionFromOpenDropdown();
 
         BrowserUtils.clearAndSendKeys(newRegistrationOfficeNumber, patient.path("officeNumber").asText());
 
@@ -434,7 +466,7 @@ public class Registration extends BasePage {
         String country = patient.path("country").asText();
         if (!country.isEmpty())
             BrowserUtils.selectAutocompleteInput(newRegistrationCountry, country);
-            BrowserUtils.selectFirstOptionFromOpenDropdown();
+        BrowserUtils.selectFirstOptionFromOpenDropdown();
         BrowserUtils.waitUntilEnabled(() -> newRegistrationState, 15);
         BrowserUtils.click(newRegistrationState);
         BrowserUtils.selectFirstOptionFromOpenDropdown();
@@ -467,11 +499,11 @@ public class Registration extends BasePage {
 
         BrowserUtils.clearAndSendKeys(newRegistrationHeight, patient.path("height").asText());
         BrowserUtils.clearAndSendKeys(newRegistrationWeight, patient.path("weight").asText());
-        
+
         String hairColorChild = patient.path("childHairColor").asText();
         if (!hairColorChild.isEmpty())
             BrowserUtils.selectFromDropdown(newRegistrationChildHairColor, hairColorChild);
-        
+
         String hairColorAdult = patient.path("adultHairColor").asText();
         if (!hairColorAdult.isEmpty())
             BrowserUtils.selectFromDropdown(newRegistrationAdultHairColor, hairColorAdult);
@@ -507,7 +539,7 @@ public class Registration extends BasePage {
         BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeAcneOccurred, 15);
         BrowserUtils.clearAndSendKeys(newRegistrationAgeAcneOccurred, patient.path("ageWhenAcneOccurred").asText());
 
-        BrowserUtils.selectCheckBox(newRegistrationTreatmentRequired,patient.path("treatmentRequired").asBoolean());
+        BrowserUtils.selectCheckBox(newRegistrationTreatmentRequired, patient.path("treatmentRequired").asBoolean());
 
         String mole = patient.path("mole").asText();
         if (!mole.isEmpty())
@@ -515,7 +547,7 @@ public class Registration extends BasePage {
 
         String freckles = patient.path("freckles").asText();
         if (!freckles.isEmpty())
-            BrowserUtils.selectFromDropdown(newRegistrationFreckles, freckles); 
+            BrowserUtils.selectFromDropdown(newRegistrationFreckles, freckles);
 
         String dimples = patient.path("dimples").asText();
         if (!dimples.isEmpty())
@@ -528,12 +560,13 @@ public class Registration extends BasePage {
         String correction = patient.path("correction").asText();
         if (!correction.isEmpty())
             BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeAcneOccurred, 15);
-            BrowserUtils.selectFromDropdown(newRegistrationCorrection, correction);
+        BrowserUtils.selectFromDropdown(newRegistrationCorrection, correction);
 
         BrowserUtils.waitUntilEnabled(() -> newRegistrationAgeWhenPrescribed, 15);
         BrowserUtils.clearAndSendKeys(newRegistrationAgeWhenPrescribed, patient.path("ageWhenPrescribed").asText());
 
-        BrowserUtils.selectCheckBox(newRegistrationHearingDifficulties, patient.path("anyHearingDifficulties").asBoolean());
+        BrowserUtils.selectCheckBox(newRegistrationHearingDifficulties,
+                patient.path("anyHearingDifficulties").asBoolean());
 
         BrowserUtils.waitUntilEnabled(() -> newRegistrationDescribeDifficulty, 15);
         BrowserUtils.clearAndSendKeys(newRegistrationDescribeDifficulty, patient.path("describeDifficulty").asText());
@@ -545,20 +578,22 @@ public class Registration extends BasePage {
         String reasonForDevices = patient.path("reasonForDevices").asText();
         if (!reasonForDevices.isEmpty())
             BrowserUtils.waitUntilEnabled(() -> newRegistrationReasonForDevices, 15);
-            BrowserUtils.selectFromDropdown(newRegistrationReasonForDevices, reasonForDevices);
+        BrowserUtils.selectFromDropdown(newRegistrationReasonForDevices, reasonForDevices);
 
         BrowserUtils.clearAndSendKeys(newRegistrationAgesUsed, patient.path("agesUsed").asText());
 
         BrowserUtils.clearAndSendKeys(newRegistrationDonorProgramName, patient.path("donorProgramName").asText());
 
-        BrowserUtils.selectCheckBox(newRegistrationConsultedWithYourFamilyWhenCompletingFamilyMedicalHistory, patient.path("consultedWithYourFamily").asBoolean());
+        BrowserUtils.selectCheckBox(newRegistrationConsultedWithYourFamilyWhenCompletingFamilyMedicalHistory,
+                patient.path("consultedWithYourFamily").asBoolean());
     }
 
     public void fillSperm_donorInformation(JsonNode patient) {
         fillPatientInformation(patient);
         commonFieldsforSpermAndEggDonor(patient);
 
-        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeSpermDonor, patient.path("everAppliedScreenedToBeSpermDonor").asBoolean());
+        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeSpermDonor,
+                patient.path("everAppliedScreenedToBeSpermDonor").asBoolean());
 
         BrowserUtils.selectCheckBox(newRegistrationDonatedSperm, patient.path("donatedSperm").asBoolean());
 
@@ -569,7 +604,8 @@ public class Registration extends BasePage {
         fillPatientInformation(patient);
         commonFieldsforSpermAndEggDonor(patient);
 
-        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeEggDonor, patient.path("everAppliedScreenedToBeEggDonor").asBoolean());
+        BrowserUtils.selectCheckBox(newRegistrationEverAppliedScreenedToBeEggDonor,
+                patient.path("everAppliedScreenedToBeEggDonor").asBoolean());
 
         BrowserUtils.selectCheckBox(newRegistrationDonatedEgg, patient.path("donatedEgg").asBoolean());
 
@@ -582,7 +618,18 @@ public class Registration extends BasePage {
     }
 
     public void register() {
-        BrowserUtils.click(registerButton);
+        BrowserUtils.click(newRegistrationRegisterButton);
+        BrowserUtils.waitForPageToLoad(15);
+    }
+
+    public void verifyRegistrationPage() {
+        String expectedUrl = JsonUtils.getValue("registration", "registrationPageUrl");
+        String actualUrl = Driver.get().getCurrentUrl();
+        Assert.assertEquals(expectedUrl, actualUrl);
+    }
+
+    public void cancel() {
+        BrowserUtils.click(newRegistrationCancelButton);
         BrowserUtils.waitForPageToLoad(15);
     }
 
@@ -593,30 +640,37 @@ public class Registration extends BasePage {
         BrowserUtils.waitForPageToLoad(10);
     }
 
+    public void confirmRegistrationNo() {
+        WebElement no = Driver.get()
+                .findElement(By.xpath("//button[normalize-space()='No']|//span[normalize-space()='No']"));
+        BrowserUtils.click(no);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
     public void verifySuccessLabel(String expectedText) {
         boolean present = BrowserUtils.isTextPresent(expectedText, 10);
         Assert.assertTrue("Success message not found: " + expectedText, present);
     }
 
     public void searchRegisteredPatientFromJsonAndVerify(String infoKey) {
-    // infoKey = "patientInformation" / "spermDonorInformation" / "oocyteDonorInformation" / "surrogateInformation"
+        // infoKey = "patientInformation" / "spermDonorInformation" /
+        // "oocyteDonorInformation" / "surrogateInformation"
 
-    JsonNode patientInfo = JsonUtils.getNestedNode("registration", "newRegistration", infoKey);
-    if (patientInfo == null || patientInfo.isMissingNode()) {
-        throw new IllegalStateException("No JSON node found for path registration.newRegistration." + infoKey);
+        JsonNode patientInfo = JsonUtils.getNestedNode("registration", "newRegistration", infoKey);
+        if (patientInfo == null || patientInfo.isMissingNode()) {
+            throw new IllegalStateException("No JSON node found for path registration.newRegistration." + infoKey);
+        }
+
+        String first = patientInfo.path("firstName").asText();
+        String last = patientInfo.path("lastName").asText();
+        fullName = (first + " " + last).trim();
+        // Search using full name (first name + last name)
+        BrowserUtils.clearAndSendKeys(searchPatient, fullName);
+        BrowserUtils.waitFor(3);
+        // Verify full name appears in the Patient column of the table
+        boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, 5);
+        Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
     }
-
-    String first = patientInfo.path("firstName").asText();
-    String last  = patientInfo.path("lastName").asText();
-    String fullName = (first + " " + last).trim();
-    // Search using full name (first name + last name)
-    BrowserUtils.clearAndSendKeys(searchPatient, fullName);
-    BrowserUtils.waitFor(3);
-    // Verify full name appears in the Patient column of the table
-    boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, 5);
-    Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
-}
-
 
     // --- JSON-driven helpers (preferred) ---
     // Populate Patient information directly from testData.json using JsonUtils
@@ -625,7 +679,7 @@ public class Registration extends BasePage {
         fillPatientInformation(patient);
     }
 
-   // Populate Partner information directly from testData.json using JsonUtils
+    // Populate Partner information directly from testData.json using JsonUtils
     public void fillPartnerInformationFromJson() {
         JsonNode partner = buildPersonNodeFromTestData("partnerInformation");
         fillPatientInformation(partner);
@@ -651,16 +705,110 @@ public class Registration extends BasePage {
         fillEgg_donorInformation(patient);
     }
 
-    // Build a JsonNode for person info (patient/partner) from testData.json using JsonUtils
+    // Build a JsonNode for person info (patient/partner) from testData.json using
+    // JsonUtils
     private JsonNode buildPersonNodeFromTestData(String personKey) {
-        // Get the nested node: registration.newRegistration.patientInformation (or partnerInformation)
+        // Get the nested node: registration.newRegistration.patientInformation (or
+        // partnerInformation)
         JsonNode personNode = JsonUtils.getNestedNode("registration", "newRegistration", personKey);
-        
+
         if (personNode == null || personNode.isMissingNode()) {
             throw new IllegalStateException("Missing registration.newRegistration." + personKey + " in testData.json");
         }
-        
+
         return personNode;
     }
 
+    public void verifyFailureMessage() {
+        boolean present = BrowserUtils.isTextPresent("Please fill all the required fields", 10);
+        Assert.assertTrue("Failure message 'Please fill all the required fields' not found", present);
+    }
+
+    public void clickPartnerLinkAndDelinkIcon(String actionType) {
+        // Dynamic XPath targeting row by patient & clicking SVG Link in Partner column
+        String xpath = "//table//tbody//tr[td[position() = count(//table//th[normalize-space()='Patient']"
+                + "/preceding-sibling::th) + 1 and contains(normalize-space(),'" + fullName + "')]]"
+                + "/td[position() = count(//table//th[normalize-space()='Partner']/preceding-sibling::th) + 1]"
+                + "//*[name()='svg']";
+
+        By linkIcon = By.xpath(xpath);
+
+        // Explicit wait and click
+        WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(10));
+        try {
+            WebElement element = wait.until(ExpectedConditions.elementToBeClickable(linkIcon));
+            element.click();
+        } catch (Exception e) {
+            throw new RuntimeException("❌ Failed to click Link icon for patient: " + fullName, e);
+        }
+    }
+
+    public void searchPartnerToLink() {
+        BrowserUtils.clearAndSendKeys(linkPartnerSearchBox, "A");
+        BrowserUtils.waitFor(5);
+    }
+
+    public void selectPartnerFromSearchResults() {
+        BrowserUtils.click(linkPartnerRadioButton);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void clickLinkPartnerButton() {
+        BrowserUtils.click(linkPartnerButton);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void verifyPartnerLinkedSuccessMessage() {
+        boolean present = BrowserUtils.isTextPresent("Link patient successful!", 10);
+        Assert.assertTrue("Success message 'Link patient successful!' not found", present);
+    }
+
+    public void verifyPartnerDelinkedSuccessMessage() {
+        boolean present = BrowserUtils.isTextPresent("Delink patient successful!", 10);
+        Assert.assertTrue("Success message 'Delink patient successful!' not found", present);
+    }
+
+    public void fillDelinkReasonAndRemark() {
+        BrowserUtils.clearAndSendKeys(delinkReasonInput,
+                JsonUtils.getNestedNode("registration", "newRegistration", "delinkPartner", "delinkReason").asText());
+        BrowserUtils.clearAndSendKeys(remarkTextarea,
+                JsonUtils.getNestedNode("registration", "newRegistration", "delinkPartner", "remark").asText());
+    }
+
+    public void clickDelinkPartnerButton() {
+        BrowserUtils.click(delinkPartnerButton);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void clickPatientNameInTable() {
+        By patient = By.xpath("//table//tbody//tr/td[" +
+                "count(//table//th[normalize-space()='Patient']/preceding-sibling::th) + 1 " +
+                "and contains(normalize-space(.), '" + fullName + "')" +
+                "]");
+        BrowserUtils.waitForPresenceOfElement(patient, 15);
+        BrowserUtils.click(Driver.get().findElement(patient));
+        BrowserUtils.waitForPageToLoad(15);
+    }
+
+    public void clickEditButtonOnPatientProfile() {
+        BrowserUtils.click(editIcon);
+        BrowserUtils.waitForPageToLoad(15);
+    }
+
+    public void modifyReasonOfVisitFromJson() {
+        String newReason = JsonUtils.getNestedNode("registration", "newRegistration", "modifyPatient",
+                "newReasonOfVisit").asText();
+        BrowserUtils.selectFromDropdown(newRegistrationReasonOfVisit, newReason);
+    }
+
+    public void clickUpdatePatientButton() {
+        BrowserUtils.click(updatePatientButton);
+        BrowserUtils.waitForPageToLoad(15);
+        BrowserUtils.waitFor(2);
+    }
+
+    public void verifyPatientUpdatedSuccessMessage() {
+        boolean present = BrowserUtils.isTextPresent("Patient updated successfully", 10);
+        Assert.assertTrue("Success message 'Patient updated successfully' not found", present);
+    }
 }
