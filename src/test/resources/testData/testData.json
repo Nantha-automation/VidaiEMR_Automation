@@ -303,5 +303,39 @@
         "newReasonOfVisit": "Radiology"
       }
     }
+  },
+  "calendar": {
+    "calendarPageUrl": "https://staging-use1.vidaisolutions.com/admin/calendar",
+    "links": [
+      "Semen Collection",
+      "Pathology",
+      "Admin",
+      "Consultation",
+      "Ultrasound",
+      "Surgery"
+    ],
+    "appointments": [
+      {
+        "tabName": "Semen Collection",
+        "patientName": "John Doe",
+        "appointmentReason": "Sample Collection",
+        "doctorName": "Dr. Smith",
+        "remarks": "Regular checkup appointment"
+      },
+      {
+        "tabName": "Consultation",
+        "patientName": "John Doe",
+        "appointmentReason": "Initial Consultation",
+        "doctorName": "Dr. Johnson",
+        "remarks": "First time consultation"
+      },
+      {
+        "tabName": "Ultrasound",
+        "patientName": "Emma Williams",
+        "appointmentReason": "Routine Scan",
+        "doctorName": "Dr. Brown",
+        "remarks": "Scheduled ultrasound scan"
+      }
+    ]
   }
 }

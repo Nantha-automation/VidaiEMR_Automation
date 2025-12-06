@@ -1,5 +1,5 @@
 @regression @registration
-Feature: Register
+Feature: New Registration for Patients, Donors, and Surrogates
 
   @register
   Scenario: Verify all elements are visible on the Registration Page

@@ -5,7 +5,7 @@ import com.EMR.utilities.JsonUtils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-public class LoginPage extends BasePage {
+public class Login extends BasePage {
 
     @FindBy(id = "standard-adornment-username")
     private WebElement username;

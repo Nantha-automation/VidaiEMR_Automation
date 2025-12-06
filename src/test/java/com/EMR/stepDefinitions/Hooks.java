@@ -1,6 +1,6 @@
 package com.EMR.stepDefinitions;
 
-import com.EMR.pages.LoginPage;
+import com.EMR.pages.Login;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.ConfigurationReader;
 import com.EMR.utilities.Driver;
@@ -55,12 +55,12 @@ public class Hooks {
      * Login once before the first @registration scenario
      * Subsequent scenarios will reuse the same session
      */
-    @Before(value = "@registration", order = 1)
+    @Before(value = "@calendar", order = 1)
     public void loginOnce() {
         if (!isLoggedIn) {
-            LoginPage loginPage = new LoginPage();
+            Login loginPage = new Login();
 
-            ExtentReportManager.logStepInfo("Performing one-time login for registration scenarios");
+            ExtentReportManager.logStepInfo("Performing one-time login for calendar scenarios");
             Driver.get().get(ConfigurationReader.get("url"));
             BrowserUtils.waitForPageToLoad(5);
             loginPage.validLogin();

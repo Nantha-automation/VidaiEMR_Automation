@@ -235,6 +235,7 @@ public class BrowserUtils {
      */
     public static void verifyElementDisplayed(WebElement element) {
         try {
+            BrowserUtils.waitForPageToLoad(10);
             Assert.assertTrue("Element not visible: " + element, element.isDisplayed());
         } catch (NoSuchElementException e) {
             e.printStackTrace();

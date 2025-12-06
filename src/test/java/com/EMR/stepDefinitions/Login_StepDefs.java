@@ -1,7 +1,6 @@
 package com.EMR.stepDefinitions;
 
-import com.EMR.pages.HomePage;
-import com.EMR.pages.LoginPage;
+import com.EMR.pages.Login;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.ConfigurationReader;
 import com.EMR.utilities.Driver;
@@ -11,8 +10,7 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 
 public class Login_StepDefs {
-    LoginPage loginPage = new LoginPage();
-    HomePage homePage = new HomePage();
+    Login loginPage = new Login();
 
     @Given("The user is on the Login page")
     public void the_user_is_on_the_login_page() {
