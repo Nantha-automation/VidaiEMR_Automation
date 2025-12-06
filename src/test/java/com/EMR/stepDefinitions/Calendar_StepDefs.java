@@ -70,5 +70,4 @@ public class Calendar_StepDefs {
             calendar.bookAppointmentsForAllTabs(configs);
         });
     }
-
 }

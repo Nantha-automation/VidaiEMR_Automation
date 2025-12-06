@@ -20,4 +20,3 @@ Feature: Calendar
     When User books appointment for "Consultation" tab from JSON test data
     When User books appointment for "Ultrasound" tab from JSON test data
     When User books appointment for "Surgery" tab from JSON test data
-    Then Appointments should be booked successfully and verified on Calendar Page

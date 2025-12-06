@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
         glue = "com.EMR.stepDefinitions",
         dryRun = false,
         //to run specific tags, specify them here
-        tags = "@calendar"
+        tags = "@bookAppointment"
         //to run couple of tags use: tags = "@tag1 or @tag2"
         //tags = "@login or @registration"
 )

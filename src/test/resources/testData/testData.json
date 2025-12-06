@@ -317,24 +317,39 @@
     "appointments": [
       {
         "tabName": "Semen Collection",
-        "patientName": "John Doe",
-        "appointmentReason": "Sample Collection",
-        "doctorName": "Dr. Smith",
+        "patientName": "Kevin Miller",
+        "appointmentReason": "Semen Freezing",
         "remarks": "Regular checkup appointment"
+      },
+      {
+        "tabName": "Pathology",
+        "patientName": "John Doe",
+        "appointmentReason": "Lipid Panel",
+        "remarks": "Fasting required"
+      },
+      {
+        "tabName": "Admin",
+        "patientName": "Emma Williams",
+        "appointmentReason": "Patient Counselling",
+        "remarks": "Bring previous medical records"
       },
       {
         "tabName": "Consultation",
         "patientName": "John Doe",
-        "appointmentReason": "Initial Consultation",
-        "doctorName": "Dr. Johnson",
+        "appointmentReason": "Diet Consultation",
         "remarks": "First time consultation"
       },
       {
         "tabName": "Ultrasound",
         "patientName": "Emma Williams",
-        "appointmentReason": "Routine Scan",
-        "doctorName": "Dr. Brown",
+        "appointmentReason": "Ultrasound Limited OB",
         "remarks": "Scheduled ultrasound scan"
+      },
+      {
+        "tabName": "Surgery",
+        "patientName": "John Doe",
+        "appointmentReason": "Hysteroscopy",
+        "remarks": "Pre-surgery consultation"
       }
     ]
   }
