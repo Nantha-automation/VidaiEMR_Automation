@@ -8,9 +8,9 @@ import java.util.Locale;
 
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.Driver;
@@ -18,6 +18,8 @@ import com.EMR.utilities.JsonUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class Calendar extends BasePage {
+
+    private static final int dayToPlus = 5;
 
     @FindBy(xpath = "//li[text()='Calendar']")
     private WebElement calendarMenu;
@@ -106,11 +108,17 @@ public class Calendar extends BasePage {
     @FindBy(xpath = "//input[contains(@placeholder,'Search Patient or Partner')]")
     public WebElement searchPatientOrPartnerInput;
 
-    @FindBy(xpath = "//label[contains(., 'Personnel')]/following::input[@role='combobox'][1]")
-    public WebElement personnelDropdown;
+    @FindBy(xpath = "(//div[contains(@class,'MuiInputBase-root') and contains(@class,'MuiOutlinedInput-root')]//input[@role='combobox'])[3]")
+    public WebElement doctorSelectionDropdown;
 
     @FindBy(xpath = "//label[contains(., 'Appointment Reason')]/following::input[@role='combobox'][1]")
     public WebElement appointmentReasonDropdown;
+
+    @FindBy(id = "room-label")
+    public WebElement roomDropdown;
+
+    @FindBy(id = "table-select")
+    public WebElement tableDropdown;
 
     @FindBy(id = "timeFrom")
     public WebElement timeFrom;
@@ -129,6 +137,30 @@ public class Calendar extends BasePage {
 
     @FindBy(xpath = "//button[normalize-space()='No']|//span[normalize-space()='No']")
     public WebElement noButton;
+
+    @FindBy(xpath = "//div[contains(@class,'MuiDialogActions-root')]//button[contains(@class,'appointmentModal_save')]")
+    public WebElement forceBookAppointmentButton;
+
+    @FindBy(xpath = "//p[normalize-space()='Patient Information']")
+    public WebElement patientInformationPageTitle;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Reschedul')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input")
+    public WebElement reschedulingReasonInput;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Cancellation')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input")
+    public WebElement cancelReasonInput;
+
+    @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Reschedule']]")
+    public WebElement rescheduleButton;
+
+    @FindBy(xpath = "//button[normalize-space()='Reschedule']")
+    public WebElement rescheduleAppointmentButton;
+
+    @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Cancel']]")
+    public WebElement cancelButton;
+
+    @FindBy(xpath = "//button[normalize-space()='Yes, Sure']")
+    public WebElement yesSureButton;
 
     public void clickCalendarMenu() {
         BrowserUtils.click(calendarMenu);
@@ -213,11 +245,24 @@ public class Calendar extends BasePage {
 
     public void bookAppointmentsForAllTabs(List<AppointmentConfig> configs) {
         for (AppointmentConfig cfg : configs) {
+            System.out.println("📅 Booking appointment for tab: " + cfg.tabName + ", Patient: " + cfg.patientName);
+
+            // Navigate to the specific tab
             clickTopTab(cfg.tabName);
-            doubleClickOnDatePlusDays(3);
+
+            // Double click on the date to open dialog
+            doubleClickOnDatePlusDays(dayToPlus);
+
+            // Verify dialog is visible
             verifyAppointmentDialogVisible();
-            fillAppointmentDialog(cfg);
-            verifyAppointmentWithDetails(cfg.patientName, cfg.tabName);
+
+            // Fill and submit the appointment
+            fillAppointmentDialog(cfg, false);
+
+            // Verify appointment was created (without re-navigating to tab)
+            verifyAppointmentCreatedOnCurrentTab(cfg.patientName);
+
+            System.out.println("✅ Completed appointment for " + cfg.tabName + "\n");
         }
     }
 
@@ -245,46 +290,70 @@ public class Calendar extends BasePage {
         BrowserUtils.waitForVisibility(appointmentDialog, 10);
     }
 
-    private void fillAppointmentDialog(AppointmentConfig cfg) {
+    private void fillAppointmentDialog(AppointmentConfig cfg, boolean forceBooking) {
         // 4. Patient search & select
         BrowserUtils.clearAndSendKeys(searchPatientOrPartnerInput, cfg.patientName);
 
         // wait for dropdown option and click
         By patientOptionLocator = By.xpath(
                 "//ul[@role='listbox']//li[@role='option' and contains(normalize-space(),'" + cfg.patientName + "')]");
+
         WebElement patientOption = BrowserUtils.waitForClickablility(patientOptionLocator, 10);
         BrowserUtils.click(patientOption);
 
         BrowserUtils.waitFor(3);
 
-        selectAvailableDoctor();
+        // ⭐ choose doctor based on mode
+        if (forceBooking == true) {
+            selectUnavailableDoctor(); // red doctor
+        } else {
+            selectAvailableDoctor(); // green doctor
+        }
+
+        // selectAvailableDoctor();
 
         BrowserUtils.waitFor(1);
-        // 5. Appointment Reason
+
         BrowserUtils.click(appointmentReasonDropdown);
 
-        By reasonOptionLocator = By.xpath("//li[contains(normalize-space(),'" + cfg.appointmentReason + "')]"
-                + "|//div[contains(normalize-space(),'" + cfg.appointmentReason + "')]");
+        By reasonOptionLocator = By.xpath(
+                "//li[contains(normalize-space(),'" + cfg.appointmentReason + "')]"
+                        + "|//div[contains(normalize-space(),'" + cfg.appointmentReason + "')]");
+
         WebElement reasonOption = BrowserUtils.waitForClickablility(reasonOptionLocator, 10);
         BrowserUtils.click(reasonOption);
 
-        // 6–7. Personnel dropdown – find doctor with green color
+        // 🔹 If tag name is "Surgery" → select Room and Table
+        if ("Surgery".equalsIgnoreCase(cfg.tagName)) {
 
-        // 9–10. Time From > now, Time To = +30 min
+            // Room dropdown
+            BrowserUtils.click(roomDropdown);
+            BrowserUtils.waitFor(3);
+            BrowserUtils.selectFirstOptionFromOpenDropdown();
+
+            // Table dropdown
+            BrowserUtils.click(tableDropdown);
+            BrowserUtils.waitFor(3);
+            BrowserUtils.selectFirstOptionFromOpenDropdown();
+        }
         setTimeFields();
-
-        // 11. Remarks + click book
         BrowserUtils.clearAndSendKeys(remark, cfg.remarks);
-
-        BrowserUtils.click(bookAppointmentButton);
-        BrowserUtils.waitForPageToLoad(10);
-        BrowserUtils.click(yesButton);
-        BrowserUtils.waitForPageToLoad(10);
+        if (forceBooking == true) {
+            BrowserUtils.click(forceBookAppointmentButton);
+            BrowserUtils.waitForPageToLoad(10);
+            BrowserUtils.click(yesButton);
+            BrowserUtils.waitForPageToLoad(10);
+        } else {
+            BrowserUtils.click(bookAppointmentButton);
+            BrowserUtils.waitForPageToLoad(10);
+            BrowserUtils.click(yesButton);
+            BrowserUtils.waitForPageToLoad(10);
+        }
     }
 
     private void selectAvailableDoctor() {
         // Open the personnel dropdown
-        BrowserUtils.click(personnelDropdown);
+        BrowserUtils.click(doctorSelectionDropdown);
         BrowserUtils.waitFor(1); // allow animation
 
         // Locate all doctor option rows inside listbox
@@ -322,6 +391,29 @@ public class Calendar extends BasePage {
         System.out.println("✔ Selected available doctor: " + doctorName);
     }
 
+    public void selectUnavailableDoctor() {
+        try {
+            // Opens the doctor dropdown (change locator to your own dropdown element)
+            BrowserUtils.click(doctorSelectionDropdown);
+            BrowserUtils.waitFor(1);
+
+            // XPath: p tag in list option containing style='red'
+            By unAvailableDoctor = By.xpath(
+                    "//li[@role='option']//p[contains(@style,'red')]");
+
+            // Wait and click the entire option (click parent li)
+            WebElement redDoctorOption = BrowserUtils.waitForClickablility(unAvailableDoctor, 10);
+
+            // Clicking the li, not p (p has no click)
+            BrowserUtils.click(redDoctorOption);
+
+            System.out.println("✔ Selected doctor marked in red color." + redDoctorOption);
+
+        } catch (Exception e) {
+            Assert.fail("❌ Failed to select unavailable doctor. Error: " + e.getMessage());
+        }
+    }
+
     private void setTimeFields() {
 
         WebElement timeFromInput = BrowserUtils.waitForVisibility(timeFrom, 10);
@@ -347,145 +439,76 @@ public class Calendar extends BasePage {
     }
 
     /**
-     * Verifies that an appointment was successfully created on the calendar page
-     * Checks for the appointment by patient name, tab, and scheduled status
-     * 
-     * @param patientName The name of the patient for whom the appointment was
-     *                    booked
-     * @param tabName     The tab where the appointment should appear (e.g., "Semen
-     *                    Collection", "Consultation")
-     * @return true if appointment is found and verified, false otherwise
-     */
-    public boolean verifyAppointmentCreated(String patientName, String tabName) {
-        try {
-            // Step 1: Navigate to the specific tab
-            clickTopTab(tabName);
-            BrowserUtils.waitForPageToLoad(3);
-
-            // Step 2: Wait for calendar to load appointments
-            BrowserUtils.waitFor(2);
-
-            // Step 3: Look for appointment card/event with patient name
-            // This XPath searches for appointment elements containing the patient name
-            By appointmentLocator = By.xpath(
-                    "//*[contains(@class,'cal-event-label')][contains(normalize-space(),'" + patientName + "')]");
-
-            // Wait for appointment element to be visible
-            WebElement appointment = BrowserUtils.waitForVisibility(appointmentLocator, 10);
-
-            if (appointment != null && appointment.isDisplayed()) {
-                System.out.println("✔ Appointment verified for patient: " + patientName + " in tab: " + tabName);
-                return true;
-            }
-
-        } catch (Exception e) {
-            System.out.println("❌ Failed to verify appointment for patient: " + patientName + " in tab: " + tabName);
-            System.out.println("Error: " + e.getMessage());
-            return false;
-        }
-
-        return false;
-    }
-
-    /**
-     * Verifies that an appointment was successfully created using AppointmentConfig
-     * This is a convenience method that uses the appointment configuration object
-     * 
-     * @param config The AppointmentConfig object containing appointment details
-     * @return true if appointment is found and verified, false otherwise
-     */
-    public boolean verifyAppointmentCreated(AppointmentConfig config) {
-        return verifyAppointmentCreated(config.patientName, config.tabName);
-    }
-
-    /**
-     * Verifies appointment with detailed information including date
-     * Uses the same date calculation as booking (today + 3 days)
+     * Verifies appointment on the current tab without navigating
+     * Use this when you're already on the correct tab
      * 
      * @param patientName The name of the patient
-     * @param tabName     The tab where the appointment should appear
-     * @return true if appointment is found with correct details, false otherwise
      */
-    public boolean verifyAppointmentWithDetails(String patientName, String tabName) {
+    private void verifyAppointmentCreatedOnCurrentTab(String patientName) {
         try {
-            // Navigate to tab
-            clickTopTab(tabName);
-            BrowserUtils.waitForPageToLoad(3);
-            BrowserUtils.waitFor(2);
+            System.out.println("🔍 Verifying appointment for patient: " + patientName);
 
-            // Calculate the appointment date (same as booking: today + 3 days)
-            LocalDate appointmentDate = LocalDate.now().plusDays(3);
+            // Wait for calendar to refresh and load the new appointment
+            BrowserUtils.waitForPageToLoad(3);
+            BrowserUtils.waitFor(3);
+
+            String firstName = patientName.split("\\s+")[0];
+
+            // Calculate the appointment date (same as booking: today + 6 days)
+            LocalDate appointmentDate = LocalDate.now().plusDays(dayToPlus);
             String monthDayYear = appointmentDate.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
 
-            // Search for appointment with both patient name and date
+            // Search for appointment with patient name and date on current view
             By appointmentLocator = By.xpath(
-                    "//div[contains(@class,'appointment') or contains(@class,'event') or contains(@class,'mbsc-schedule-event') or contains(@class,'cal-event')]"
-                            +
-                            "[contains(.,'" + patientName + "')]" +
-                            "[contains(@aria-label,'" + monthDayYear + "') or ancestor::*[contains(@aria-label,'"
-                            + monthDayYear
-                            + "')]]");
+                    "//div[@id=//div[contains(@aria-label,'" + monthDayYear + "')]/@aria-describedby]"
+                            + "//div[contains(@class,'mbsc-calendar-label-wrapper')"
+                            + " and contains(@title,'" + firstName + "')]");
 
             WebElement appointment = BrowserUtils.waitForVisibility(appointmentLocator, 10);
 
             if (appointment != null && appointment.isDisplayed()) {
-                System.out.println("✔ Appointment verified with details - Patient: " + patientName +
-                        ", Tab: " + tabName + ", Date: " + monthDayYear);
-                return true;
+                System.out.println("✔ Appointment verified for patient: " + patientName + " on date: " + monthDayYear);
+                return;
             }
 
-        } catch (Exception e) {
-            System.out.println("❌ Failed to verify appointment details for patient: " + patientName);
-            System.out.println("Error: " + e.getMessage());
-            return false;
-        }
+            Assert.fail("❌ Appointment element not visible for Patient: " + patientName);
 
-        return false;
+        } catch (TimeoutException e) {
+            Assert.fail("❌ Appointment NOT found for Patient: " + patientName + ". Timeout waiting for element. "
+                    + e.getMessage());
+        } catch (Exception e) {
+            Assert.fail("❌ Failed to verify appointment for Patient: " + patientName + ". Error: " + e.getMessage());
+        }
     }
 
     /**
-     * Verifies appointment with custom date
-     * 
-     * @param patientName   The name of the patient
-     * @param tabName       The tab where the appointment should appear
-     * @param daysFromToday Number of days from today for the appointment date
-     * @return true if appointment is found with correct details, false otherwise
+     * Clicks the appointment for the given patient on the current tab.
+     * This method expects the appointment to already exist.
+     *
+     * @param patientName Name of the patient to click appointment for
      */
-    public boolean verifyAppointmentWithDetails(String patientName, String tabName, int daysFromToday) {
+    private void clickAppointmentOnCurrentTab(String patientName) {
         try {
-            // Navigate to tab
-            clickTopTab(tabName);
-            BrowserUtils.waitForPageToLoad(3);
-            BrowserUtils.waitFor(2);
+            System.out.println("🖱 Trying to click on the appointment for: " + patientName);
 
-            // Calculate the appointment date based on days from today
-            LocalDate appointmentDate = LocalDate.now().plusDays(daysFromToday);
+            String firstName = patientName.split("\\s+")[0];
+
+            LocalDate appointmentDate = LocalDate.now().plusDays(dayToPlus);
             String monthDayYear = appointmentDate.format(DateTimeFormatter.ofPattern("MMMM d, yyyy"));
 
-            // Search for appointment with both patient name and date
             By appointmentLocator = By.xpath(
-                    "//div[contains(@class,'appointment') or contains(@class,'event') or contains(@class,'mbsc-schedule-event') or contains(@class,'cal-event')]"
-                            +
-                            "[contains(.,'" + patientName + "')]" +
-                            "[contains(@aria-label,'" + monthDayYear + "') or ancestor::*[contains(@aria-label,'"
-                            + monthDayYear
-                            + "')]]");
+                    "//div[@id=//div[contains(@aria-label,'" + monthDayYear + "')]/@aria-describedby]"
+                            + "//div[contains(@class,'mbsc-calendar-label-wrapper')"
+                            + " and contains(@title,'" + firstName + "')]");
 
-            WebElement appointment = BrowserUtils.waitForVisibility(appointmentLocator, 10);
+            WebElement appointment = BrowserUtils.waitForClickablility(appointmentLocator, 10);
 
-            if (appointment != null && appointment.isDisplayed()) {
-                System.out.println("✔ Appointment verified with details - Patient: " + patientName +
-                        ", Tab: " + tabName + ", Date: " + monthDayYear);
-                return true;
-            }
+            BrowserUtils.click(appointment);
+            System.out.println("🖱 Clicked appointment for: " + patientName);
 
         } catch (Exception e) {
-            System.out.println("❌ Failed to verify appointment details for patient: " + patientName);
-            System.out.println("Error: " + e.getMessage());
-            return false;
+            Assert.fail("❌ Failed to click appointment for patient: " + patientName + ". Error: " + e.getMessage());
         }
-
-        return false;
     }
 
     // Inner class to hold appointment configuration
@@ -494,6 +517,7 @@ public class Calendar extends BasePage {
         public String patientName;
         public String appointmentReason;
         public String remarks;
+        public String tagName;
 
         public AppointmentConfig(String tabName, String patientName, String appointmentReason,
                 String remarks) {
@@ -501,7 +525,134 @@ public class Calendar extends BasePage {
             this.patientName = patientName;
             this.appointmentReason = appointmentReason;
             this.remarks = remarks;
+            this.tagName = tabName; // Set tagName same as tabName for Surgery check
         }
+    }
+
+    public void forceBookAppointment(AppointmentConfig cfg) {
+        System.out.println("📅 Booking appointment for tab: " + cfg.tabName + ", Patient: " + cfg.patientName);
+
+        // Navigate to the specific tab
+        clickTopTab(cfg.tabName);
+
+        // Double click on the date to open dialog
+        doubleClickOnDatePlusDays(dayToPlus);
+
+        // Verify dialog is visible
+        verifyAppointmentDialogVisible();
+
+        // Fill and submit the appointment
+        fillAppointmentDialog(cfg, true);
+
+        // Verify appointment was created (without re-navigating to tab)
+        verifyAppointmentCreatedOnCurrentTab(cfg.patientName);
+
+        System.out.println("✅ Completed appointment for " + cfg.tabName + "\n");
+    }
+
+    public void verifyPatientInformationPage() {
+        BrowserUtils.waitForVisibility(patientInformationPageTitle, 10);
+        Assert.assertTrue("❌ Patient Information page is NOT displayed!", patientInformationPageTitle.isDisplayed());
+        System.out.println("✔ Patient Information page verified successfully.");
+    }
+
+    public void rescheduleAppointment(AppointmentConfig cfg) {
+        try {
+            System.out.println("🔄 Rescheduling appointment for patient: " + cfg.patientName);
+
+            // Click on the existing appointment to open options
+            clickAppointmentOnCurrentTab(cfg.patientName);
+
+            BrowserUtils.waitFor(2);
+
+            // Click on Reschedule button
+            BrowserUtils.click(rescheduleButton);
+            BrowserUtils.waitForPageToLoad(10);
+
+            JsonNode appointmentsArray = JsonUtils.getNestedNode("calendar", "appointments");
+
+            Assert.assertTrue("'appointments' is not an array in JSON", appointmentsArray.isArray());
+
+            JsonNode metaNode = appointmentsArray.get(appointmentsArray.size() - 1); // last element
+
+            String rescheduleReason = metaNode.path("rescheduleReason").asText();
+
+            BrowserUtils.clearAndSendKeys(reschedulingReasonInput, rescheduleReason);
+
+            System.out.println("✅ Rescheduled appointment for patient: " + cfg.patientName + "\n");
+
+        } catch (Exception e) {
+            Assert.fail("❌ Failed to reschedule appointment for Patient: " + cfg.patientName + ". Error: "
+                    + e.getMessage());
+        }
+
+        clickRescheduleButtonWithToastCheck();
+
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    private void clickRescheduleButtonWithToastCheck() {
+        // 🔎 Check if the toast appears (within 2 seconds)
+        if (BrowserUtils.waitForElementPresent(close, 2)) {
+            System.out.println("⚠ Error toast detected! Closing toast…");
+            BrowserUtils.click(close);
+            BrowserUtils.waitFor(1);
+        }
+
+        // 🖱 Now safely click reschedule
+        BrowserUtils.click(rescheduleAppointmentButton);
+        System.out.println("🖱 Clicked the Reschedule button.");
+    }
+
+    public void verifyRescheduleSuccessMessage() {
+        By successMsgLocator = By.xpath(
+                "//div[contains(@class,'MuiAlert-message') and contains(normalize-space(),'Appointment has been rescheduled')]");
+        WebElement successMsg = BrowserUtils.waitForVisibility(successMsgLocator, 10);
+        Assert.assertTrue("❌ Reschedule success message NOT displayed!", successMsg.isDisplayed());
+        System.out.println("✔ Reschedule success message verified successfully.");
+    }
+
+    public void cancelAppointment(AppointmentConfig cfg) {
+        try {
+            System.out.println("❌ Cancelling appointment for patient: " + cfg.patientName);
+
+            // Click on the existing appointment to open options
+            clickAppointmentOnCurrentTab(cfg.patientName);
+
+            BrowserUtils.waitFor(2);
+
+            // Click on Cancel button
+            BrowserUtils.click(cancelButton);
+            BrowserUtils.waitForPageToLoad(10);
+
+            JsonNode appointmentsArray = JsonUtils.getNestedNode("calendar", "appointments");
+
+            Assert.assertTrue("'appointments' is not an array in JSON", appointmentsArray.isArray());
+
+            JsonNode metaNode = appointmentsArray.get(appointmentsArray.size() - 1); // last element
+
+            String cancelReason = metaNode.path("cancelReason").asText();
+
+            BrowserUtils.clearAndSendKeys(cancelReasonInput, cancelReason);
+
+            System.out.println("✅ Cancelled appointment for patient: " + cfg.patientName + "\n");
+
+        } catch (Exception e) {
+            Assert.fail(
+                    "❌ Failed to cancel appointment for Patient: " + cfg.patientName + ". Error: " + e.getMessage());
+        }
+
+        BrowserUtils.click(yesSureButton);
+
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void verifyCancelSuccessMessage() {
+        By successMsgLocator = By.xpath(
+                "//div[contains(@class,'MuiAlert-message') and contains(normalize-space(),'The appointment has been cancelled successfully.')]");
+        WebElement successMsg = BrowserUtils.waitForVisibility(successMsgLocator, 10);
+        Assert.assertTrue("❌ Cancel success message NOT displayed!", successMsg.isDisplayed());
+        System.out.println("✔ Cancel success message verified successfully.");
     }
 
     /**

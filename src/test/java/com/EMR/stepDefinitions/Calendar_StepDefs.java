@@ -7,7 +7,6 @@ import com.EMR.pages.Calendar.AppointmentConfig;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.JsonUtils;
 
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -68,6 +67,50 @@ public class Calendar_StepDefs {
             AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
             List<AppointmentConfig> configs = java.util.Arrays.asList(config);
             calendar.bookAppointmentsForAllTabs(configs);
+        });
+    }
+
+    @When("User books appointment for {string} tab from JSON test data with force booking option")
+    public void user_books_appointment_for_tab_from_json_test_data_with_force_booking_option(String tabName) {
+        String stepName = "User books appointment for " + tabName
+                + " tab from JSON test data with force booking option";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.forceBookAppointment(config);
+        });
+    }
+
+    @When("User reschedules an existing appointment for {string} tab from JSON test data")
+    public void user_reschedules_an_existing_appointment_for_tab_from_json_test_data(String tabName) {
+        String stepName = "User reschedules an existing appointment for " + tabName + " tab from JSON test data";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.rescheduleAppointment(config);
+        });
+    }
+
+    @Then("The appointment should be rescheduled successfully message should be displayed")
+    public void the_appointment_should_be_rescheduled_successfully_message_should_be_displayed() {
+        String stepName = "The appointment should be rescheduled successfully message should be displayed";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.verifyRescheduleSuccessMessage();
+        });
+    }
+
+    @When("User cancels an existing appointment for {string} tab from JSON test data")
+    public void user_cancels_an_existing_appointment_for_tab_from_json_test_data(String tabName) {
+        String stepName = "User cancels an existing appointment for " + tabName + " tab from JSON test data";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.cancelAppointment(config);
+        });
+    }
+
+    @Then("The appointment should be cancelled successfully message should be displayed")
+    public void the_appointment_should_be_cancelled_successfully_message_should_be_displayed() {
+        String stepName = "The appointment should be cancelled successfully message should be displayed";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.verifyCancelSuccessMessage();
         });
     }
 }

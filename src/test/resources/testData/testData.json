@@ -317,7 +317,7 @@
     "appointments": [
       {
         "tabName": "Semen Collection",
-        "patientName": "Kevin Miller",
+        "patientName": "Mathew Doe",
         "appointmentReason": "Semen Freezing",
         "remarks": "Regular checkup appointment"
       },
@@ -350,6 +350,10 @@
         "patientName": "John Doe",
         "appointmentReason": "Hysteroscopy",
         "remarks": "Pre-surgery consultation"
+      },
+      {
+        "rescheduleReason": "Scheduling conflict",
+        "cancelReason": "Patient unavailable"
       }
     ]
   }

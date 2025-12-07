@@ -427,6 +427,16 @@ public class BrowserUtils {
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
+    public static boolean waitForElementPresent(WebElement element, int timeoutSeconds) {
+        try {
+            WebDriverWait wait = new WebDriverWait(Driver.get(), Duration.ofSeconds(timeoutSeconds));
+            wait.until(ExpectedConditions.visibilityOf(element));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static void clearAndSendKeys(WebElement element, String text) {
         element.clear();
         element.sendKeys(text);
