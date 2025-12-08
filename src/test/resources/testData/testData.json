@@ -355,6 +355,35 @@
         "rescheduleReason": "Scheduling conflict",
         "cancelReason": "Patient unavailable"
       }
-    ]
+    ],
+    "newPatientAppointment": {
+      "firstName": "Nantha",
+      "lastName": "Test",
+      "sexAssignedAtBirth": "Male",
+      "countryCode": "232",
+      "mobileNumber": "5551234567",
+      "dob": "10/11/1995",
+      "emailId": "nantha.test@example.com",
+      "prefix": "Mr.",
+      "middleName": "A",
+      "bloodGroup": "O+",
+      "maritialStatus": "Married",
+      "idType": "Driving License",
+      "id": "D1234567",
+      "referenceSource": "Employee",
+      "additionalDetails": "Referred by a Employee",
+      "occupation/industry": "Engineering",
+      "reasonOfVisit": "Surgery",
+      "ethinicity": "Black",
+      "prefferedLanguage": "English",
+      "countryCodeOffice": "672",
+      "officeNumber": "5557654321",
+      "address": "123 Main St, Anytown, UK",
+      "country": "United Kingdom",
+      "state": "Trafford",
+      "city": "Partington",
+      "areaCode": "90001",
+      "successMessage": "Patient registered successfully."
+    }
   }
 }

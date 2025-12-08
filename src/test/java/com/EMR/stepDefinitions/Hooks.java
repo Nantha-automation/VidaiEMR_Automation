@@ -52,15 +52,16 @@ public class Hooks {
     }
 
     /**
-     * Login once before the first @registration scenario
+     * Login once before the first @calendar or @registration scenario
      * Subsequent scenarios will reuse the same session
+     * This hook does NOT run for @login scenarios (they test login functionality)
      */
-    @Before(value = "@calendar", order = 1)
+    @Before(value = "@calendar or @registration", order = 1)
     public void loginOnce() {
         if (!isLoggedIn) {
             Login loginPage = new Login();
 
-            ExtentReportManager.logStepInfo("Performing one-time login for calendar scenarios");
+            ExtentReportManager.logStepInfo("Performing one-time login for calendar/registration scenarios");
             Driver.get().get(ConfigurationReader.get("url"));
             BrowserUtils.waitForPageToLoad(5);
             loginPage.validLogin();

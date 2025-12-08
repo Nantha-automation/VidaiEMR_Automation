@@ -1,5 +1,6 @@
 package com.EMR.pages;
 
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class Calendar extends BasePage {
 
-    private static final int dayToPlus = 5;
+    private static final int dayToPlus = 10;
 
     @FindBy(xpath = "//li[text()='Calendar']")
     private WebElement calendarMenu;
@@ -153,6 +154,15 @@ public class Calendar extends BasePage {
     @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Reschedule']]")
     public WebElement rescheduleButton;
 
+    @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Check In']]")
+    public WebElement checkInButton;
+
+    @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Check Out']]")
+    public WebElement checkOutButton;
+
+    @FindBy(xpath = "//div[contains(@style,'cursor')][.//p[normalize-space()='Register']]")
+    public WebElement registerButton;
+
     @FindBy(xpath = "//button[normalize-space()='Reschedule']")
     public WebElement rescheduleAppointmentButton;
 
@@ -162,8 +172,35 @@ public class Calendar extends BasePage {
     @FindBy(xpath = "//button[normalize-space()='Yes, Sure']")
     public WebElement yesSureButton;
 
+    @FindBy(xpath = "//button[normalize-space()='New Patient']")
+    public WebElement newPatientButton;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'First Name')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
+    public WebElement newAppointmentFirstName;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Last Name')]/ancestor::div[contains(@class,'MuiFormControl-root')]//input[not(@disabled)]")
+    public WebElement newAppointmentLastName;
+
+    @FindBy(xpath = "//div[@role='combobox' and @aria-labelledby='gender-label']")
+    public WebElement newAppointmentSexAssignedAtBirthDropdown;
+
+    @FindBy(xpath = "//input[@type='date']")
+    public WebElement newAppointmentDateOfBirth;
+
+    @FindBy(xpath = "//label[contains(normalize-space(),'Country Code')]/following-sibling::div//input[@type='text']")
+    public WebElement newAppointmentCountryCode;
+
+    @FindBy(xpath = "//label[contains(.,'Mobile')]/following::input[@type='tel']")
+    public WebElement newAppointmentMobile;
+
+    @FindBy(xpath = "//label[contains(.,'Email')]/following::input[@type='text'][1]")
+    public WebElement newAppointmentEmail;
+
+    Registration registration = new Registration();
+
     public void clickCalendarMenu() {
         BrowserUtils.click(calendarMenu);
+        BrowserUtils.waitForPageToLoad(10);
     }
 
     public void verifyUiElements() {
@@ -257,7 +294,7 @@ public class Calendar extends BasePage {
             verifyAppointmentDialogVisible();
 
             // Fill and submit the appointment
-            fillAppointmentDialog(cfg, false);
+            fillAppointmentDialog(cfg, false, true);
 
             // Verify appointment was created (without re-navigating to tab)
             verifyAppointmentCreatedOnCurrentTab(cfg.patientName);
@@ -286,13 +323,38 @@ public class Calendar extends BasePage {
         BrowserUtils.doubleClick(cell);
     }
 
+    public void clickRegisterButtonInPatientInformationPopup() {
+        BrowserUtils.click(registerButton);
+    }
+
+    public void completeRegistrationForNewPatientUsingJsonData() {
+        JsonNode newPatientAppoinment = JsonUtils.getNestedNode("calendar", "newPatientAppointment");
+        registration.fillPatientInformation(newPatientAppoinment);
+        registration.clickUpdatePatientButton();
+        registration.confirmRegistrationYes();
+    }
+
+    public void clickExitPatientButtonFromSidebar() {
+        registration.clickExitPatient();
+    }
+
+    public void clickCheckInButtonInPatientInformationPopup() {
+        BrowserUtils.click(checkInButton);
+    }
+
+    public void clickCheckOutButtonInPatientInformationPopup() {
+        BrowserUtils.click(checkOutButton);
+    }
+
     private void verifyAppointmentDialogVisible() {
         BrowserUtils.waitForVisibility(appointmentDialog, 10);
     }
 
-    private void fillAppointmentDialog(AppointmentConfig cfg, boolean forceBooking) {
-        // 4. Patient search & select
-        BrowserUtils.clearAndSendKeys(searchPatientOrPartnerInput, cfg.patientName);
+    private void fillAppointmentDialog(AppointmentConfig cfg, boolean forceBooking, boolean isExistingPatient) {
+        // For existing patient → perform search & select
+        if (isExistingPatient == true) {
+            BrowserUtils.clearAndSendKeys(searchPatientOrPartnerInput, cfg.patientName);
+        }
 
         // wait for dropdown option and click
         By patientOptionLocator = By.xpath(
@@ -487,7 +549,7 @@ public class Calendar extends BasePage {
      *
      * @param patientName Name of the patient to click appointment for
      */
-    private void clickAppointmentOnCurrentTab(String patientName) {
+    public void clickAppointmentOnCurrentTab(String patientName) {
         try {
             System.out.println("🖱 Trying to click on the appointment for: " + patientName);
 
@@ -535,19 +597,38 @@ public class Calendar extends BasePage {
         // Navigate to the specific tab
         clickTopTab(cfg.tabName);
 
-        // Double click on the date to open dialog
+        // // Double click on the date to open dialog
         doubleClickOnDatePlusDays(dayToPlus);
 
         // Verify dialog is visible
         verifyAppointmentDialogVisible();
 
         // Fill and submit the appointment
-        fillAppointmentDialog(cfg, true);
+        fillAppointmentDialog(cfg, true, true);
 
         // Verify appointment was created (without re-navigating to tab)
         verifyAppointmentCreatedOnCurrentTab(cfg.patientName);
 
         System.out.println("✅ Completed appointment for " + cfg.tabName + "\n");
+    }
+
+    public void fillNewPatientDetails() {
+        BrowserUtils.click(newPatientButton);
+        BrowserUtils.waitForPageToLoad(10);
+        JsonNode newPatientAppoinment = JsonUtils.getNestedNode("calendar", "newPatientAppointment");
+        BrowserUtils.clearAndSendKeys(newAppointmentFirstName, newPatientAppoinment.path("firstName").asText());
+        BrowserUtils.clearAndSendKeys(newAppointmentLastName, newPatientAppoinment.path("lastName").asText());
+        String sex = newPatientAppoinment.path("sexAssignedAtBirth").asText();
+        if (!sex.isEmpty())
+            BrowserUtils.selectFromDropdown(newAppointmentSexAssignedAtBirthDropdown, sex);
+        BrowserUtils.clearAndSendKeys(newAppointmentDateOfBirth, newPatientAppoinment.path("dob").asText());
+        String ccMobile = newPatientAppoinment.path("countryCode").asText();
+        if (!ccMobile.isEmpty())
+            BrowserUtils.selectAutocompleteInput(newAppointmentCountryCode, ccMobile);
+        BrowserUtils.selectFirstOptionFromOpenDropdown();
+        BrowserUtils.clearAndSendKeys(newAppointmentMobile, newPatientAppoinment.path("mobileNumber").asText());
+        BrowserUtils.clearAndSendKeys(newAppointmentEmail, newPatientAppoinment.path("emailId").asText());
+        BrowserUtils.waitFor(1);
     }
 
     public void verifyPatientInformationPage() {
@@ -559,7 +640,7 @@ public class Calendar extends BasePage {
     public void rescheduleAppointment(AppointmentConfig cfg) {
         try {
             System.out.println("🔄 Rescheduling appointment for patient: " + cfg.patientName);
-
+            clickTopTab(cfg.tabName);
             // Click on the existing appointment to open options
             clickAppointmentOnCurrentTab(cfg.patientName);
 
@@ -604,18 +685,10 @@ public class Calendar extends BasePage {
         System.out.println("🖱 Clicked the Reschedule button.");
     }
 
-    public void verifyRescheduleSuccessMessage() {
-        By successMsgLocator = By.xpath(
-                "//div[contains(@class,'MuiAlert-message') and contains(normalize-space(),'Appointment has been rescheduled')]");
-        WebElement successMsg = BrowserUtils.waitForVisibility(successMsgLocator, 10);
-        Assert.assertTrue("❌ Reschedule success message NOT displayed!", successMsg.isDisplayed());
-        System.out.println("✔ Reschedule success message verified successfully.");
-    }
-
     public void cancelAppointment(AppointmentConfig cfg) {
         try {
             System.out.println("❌ Cancelling appointment for patient: " + cfg.patientName);
-
+            clickTopTab(cfg.tabName);
             // Click on the existing appointment to open options
             clickAppointmentOnCurrentTab(cfg.patientName);
 
@@ -647,12 +720,48 @@ public class Calendar extends BasePage {
         BrowserUtils.waitForPageToLoad(10);
     }
 
-    public void verifyCancelSuccessMessage() {
+    public void verifySuccessMessage(String expectedMsg) {
         By successMsgLocator = By.xpath(
-                "//div[contains(@class,'MuiAlert-message') and contains(normalize-space(),'The appointment has been cancelled successfully.')]");
+                "//div[contains(@class,'MuiAlert-message') and contains(normalize-space(),'" + expectedMsg + "')]");
+
         WebElement successMsg = BrowserUtils.waitForVisibility(successMsgLocator, 10);
-        Assert.assertTrue("❌ Cancel success message NOT displayed!", successMsg.isDisplayed());
-        System.out.println("✔ Cancel success message verified successfully.");
+        Assert.assertTrue("❌ Expected success message NOT displayed: " + expectedMsg, successMsg.isDisplayed());
+
+        System.out.println("✔ Success message verified: " + expectedMsg);
+    }
+
+    public void verifyAppointmentStatus(String expectedStatus) {
+        By statusLocator = By.xpath(
+                "//span[contains(@class,'MuiChip-label') and normalize-space()='" + expectedStatus + "']");
+
+        WebElement status = BrowserUtils.waitForVisibility(statusLocator, 10);
+        Assert.assertTrue("❌ Expected status NOT displayed: " + expectedStatus, status.isDisplayed());
+
+        System.out.println("✔ Appointment status verified: " + expectedStatus);
+    }
+
+    public void bookAppointmentForNewPatient(AppointmentConfig cfg) {
+        System.out.println(
+                "📅 Booking appointment for NEW patient on tab: " + cfg.tabName + ", Patient: " + cfg.patientName);
+
+        // Navigate to the specific tab
+        clickTopTab(cfg.tabName);
+
+        // Double click on the date to open dialog
+        doubleClickOnDatePlusDays(dayToPlus);
+
+        // Verify dialog is visible
+        verifyAppointmentDialogVisible();
+
+        fillNewPatientDetails();
+
+        // Fill and submit the appointment
+        fillAppointmentDialog(cfg, false, false);
+
+        // Verify appointment was created (without re-navigating to tab)
+        verifyAppointmentCreatedOnCurrentTab(cfg.patientName);
+
+        System.out.println("✅ Completed appointment for new patient on " + cfg.tabName + "\n");
     }
 
     /**

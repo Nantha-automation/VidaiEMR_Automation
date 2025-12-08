@@ -7,9 +7,12 @@ import com.EMR.pages.Calendar.AppointmentConfig;
 import com.EMR.utilities.BrowserUtils;
 import com.EMR.utilities.JsonUtils;
 
+
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 
 import org.junit.Assert;
 
@@ -93,7 +96,7 @@ public class Calendar_StepDefs {
     public void the_appointment_should_be_rescheduled_successfully_message_should_be_displayed() {
         String stepName = "The appointment should be rescheduled successfully message should be displayed";
         BrowserUtils.executeStep(stepName, () -> {
-            calendar.verifyRescheduleSuccessMessage();
+            calendar.verifySuccessMessage("Appointment has been rescheduled");
         });
     }
 
@@ -110,7 +113,107 @@ public class Calendar_StepDefs {
     public void the_appointment_should_be_cancelled_successfully_message_should_be_displayed() {
         String stepName = "The appointment should be cancelled successfully message should be displayed";
         BrowserUtils.executeStep(stepName, () -> {
-            calendar.verifyCancelSuccessMessage();
+            calendar.verifySuccessMessage("The appointment has been cancelled successfully.");
+        });
+    }
+
+    @When("User books appointment for a new patient for {string} tab from JSON test data")
+    public void user_books_appointment_for_a_new_patient_for_tab_from_json_test_data(String tabName) {
+        String stepName = "User books appointment for a new patient for " + tabName + " tab from JSON test data";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.bookAppointmentForNewPatient(config);
+        });
+    }
+
+    @Then("A success message should be displayed confirming that the appointment has been booked")
+    public void a_success_message_should_be_displayed_confirming_that_the_appointment_has_been_booked() {
+        String stepName = "A success message should be displayed confirming that the appointment has been booked";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.verifySuccessMessage("Appointment booked successfully!");
+        });
+    }
+
+    @Then("The user opens the newly booked appointment from {string} tab")
+    public void the_user_opens_the_newly_booked_appointment_from_tab(String tabName) {
+        String stepName = "The user opens the newly booked appointment from " + tabName + " tab";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.clickAppointmentOnCurrentTab(config.patientName);
+        });
+    }
+
+    @Then("Clicks on the Register button in the Patient information popup")
+    public void clicks_on_the_register_button_in_the_patient_information_popup() {
+        String stepName = "Clicks on the Register button in the Patient information popup";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.clickRegisterButtonInPatientInformationPopup();
+        });
+    }
+
+    @Then("Completes the registration for the new patient using JSON test data")
+    public void completes_the_registration_for_the_new_patient_using_json_test_data() {
+        String stepName = "Completes the registration for the new patient using JSON test data";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.completeRegistrationForNewPatientUsingJsonData();
+        });
+    }
+
+    @Then("A success message should be displayed confirming that the registration has been completed")
+    public void a_success_message_should_be_displayed_confirming_that_the_registration_has_been_completed() {
+        String stepName = "A success message should be displayed confirming that the registration has been completed";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.verifySuccessMessage("Patient updated successfully");
+        });
+    }
+
+    @Then("The user clicks on Exit Patient button from the sidebar")
+    public void the_user_clicks_on_exit_patient_button_from_the_sidebar() {
+        String stepName = "The user clicks on Exit Patient button from the sidebar";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.clickExitPatientButtonFromSidebar();
+        });
+    }
+
+    @Then("The user navigates back to the Calendar page")
+    public void the_user_navigates_back_to_the_calendar_page() {
+        String stepName = "The user navigates back to the Calendar page";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.clickCalendarMenu();
+        });
+    }
+
+    @And("Opens the newly booked appointment again using {string} tab")
+    public void opens_the_newly_booked_appointment_again(String tabName) {
+        String stepName = "Opens the newly booked appointment again using " + tabName + " tab";
+        BrowserUtils.executeStep(stepName, () -> {
+            AppointmentConfig config = Calendar.loadAppointmentByTabFromJson(tabName);
+            calendar.clickAppointmentOnCurrentTab(config.patientName);
+        });
+    }
+
+    @And("Clicks on the Check-In button in the patient information popup")
+    public void clicks_on_the_check_in_button_in_the_patient_information_popup() {
+        String stepName = "Clicks on the Check-In button in the patient information popup";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.clickCheckInButtonInPatientInformationPopup();
+        });
+    }
+
+    @Then("The patient status should be updated to {string} status in the patient information popup")
+    public void the_patient_status_should_be_updated_to_status_in_the_patient_information_popup(String expectedStatus) {
+        String stepName = "The patient status should be updated to " + expectedStatus
+                + " status in the patient information popup";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.verifyAppointmentStatus(expectedStatus);
+        });
+    }
+
+    @And("User clicks on the Check-Out button in the patient information popup")
+    public void user_clicks_on_the_check_out_button_in_the_patient_information_popup() {
+        String stepName = "User clicks on the Check-Out button in the patient information popup";
+        BrowserUtils.executeStep(stepName, () -> {
+            calendar.clickCheckOutButtonInPatientInformationPopup();
         });
     }
 }
