@@ -3,14 +3,14 @@
 <head>
 </head>
 <body>
-  <h1>Selenium Cucumber Automation Testing Exercise</h1>
+  <h1>Selenium Cucumber Automation Testing </h1>
 
-  <p>This project contains software automation testing exercises inspired by the test cases on <a href="https://automationexercise.com/">automationexercise.com</a>.</p>
+  <p>This project contains software automation testing exercises inspired by the test cases on <a href="(https://99999.preview.vidaisolutions.com/login)">automationexercise.com</a>.</p>
 
   <h2>Project Details</h2>
 
   <ul>
-    <li>GitHub Repository: <a href="https://github.com/githsem/Selenium_Cucumber_AutomationExercise">https://github.com/githsem/Selenium_Cucumber_AutomationExercise</a></li>
+    <li>GitHub Repository: <a href="https://github.com/nanthakumark/EMR_Automation">https://github.com/nanthakumark/EMR_Automation</a></li>
     <li>Language: Java</li>
     <li>Frameworks and Libraries:
       <ul>
@@ -28,7 +28,7 @@
 
   <ol>
     <li>Clone the repository:
-    <pre><code>git clone https://github.com/githsem/Selenium_Cucumber_AutomationExercise.git</code></pre>
+    <pre><code>git clone https://github.com/nanthakumark/EMR_Automation.git</code></pre>
     </li>
     <li>Open the project in your preferred Java IDE.
     </li>
