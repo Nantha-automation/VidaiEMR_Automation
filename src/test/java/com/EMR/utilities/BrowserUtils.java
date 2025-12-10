@@ -8,6 +8,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -121,6 +123,28 @@ public class BrowserUtils {
             js.executeScript("arguments[0].click();", element);
         }
     }
+
+    public static String hoverProfileAndGetSexAssignedAtBirth(int profileIndex) {
+        WebDriver driver = Driver.get();
+        Actions actions = new Actions(driver);
+
+        // 1. Hover on N-th profile picture
+        String imgXpath = String.format("(//div[contains(@class,'header_Profile_pics')]//img)[%d]", profileIndex);
+        By imgLocator = By.xpath(imgXpath);
+
+        WebElement profileImg = BrowserUtils.waitForVisibility(imgLocator, 10);
+        actions.moveToElement(profileImg).perform();
+        BrowserUtils.waitFor(2); // wait for tooltip/popover
+
+        // 2. Locate the value next to "Sex Assigned at Birth"
+        By sexValueLocator = By.xpath(
+                "//*[normalize-space()='Sex Assigned at Birth']/following-sibling::*[1]");
+        WebElement sexValueElement = BrowserUtils.waitForVisibility(sexValueLocator, 10);
+
+        // 3. Return the text
+        return sexValueElement.getText().trim();
+    }
+
 
     /**
      * Waits for the provided element to be visible on the page
@@ -451,6 +475,63 @@ public class BrowserUtils {
                 break;
             }
         }
+    }
+
+    /**
+     * Generic method:
+     * - Reads JSON node using a dynamic path
+     * - Builds full name from dynamic first/last name keys
+     * - Types into a dynamic search field
+     * - Verifies the name exists in the patient table
+     */
+    public static void searchByFullNameFromJsonAndVerifyInPatientTable(
+            WebElement searchField,
+            int tableTimeoutSeconds,
+            String name,
+            String... jsonPath) { // dynamic path for getNestedNode
+
+        // Example jsonPath: "registration", "newRegistration", "patientInformation"
+
+        JsonNode patientInformation = JsonUtils.getNestedNode(jsonPath);
+        if (patientInformation == null || patientInformation.isMissingNode()) {
+            throw new IllegalStateException(
+                    "No JSON node found for path: " + String.join(".", jsonPath));
+        }
+
+        // 2. Get full name from JSON using dynamic keys
+        String fullName = patientInformation.path(name).asText();
+        // 3. Use dynamic search WebElement
+        BrowserUtils.clearAndSendKeys(searchField, fullName);
+        BrowserUtils.waitFor(3);
+
+        // 4. Verify in table (still using your existing helper)
+        boolean foundInTable = BrowserUtils.isPatientPresentInTable(fullName, tableTimeoutSeconds);
+        Assert.assertTrue("Registered patient '" + fullName + "' not found in patient table", foundInTable);
+    }
+
+     public static void clickPatientNameInTable(String fullName) {
+        By patient = By.xpath("//table//tbody//tr/td[" +
+                "count(//table//th[normalize-space()='Patient']/preceding-sibling::th) + 1 " +
+                "and contains(normalize-space(.), '" + fullName + "')" +
+                "]");
+        BrowserUtils.waitForPresenceOfElement(patient, 15);
+        BrowserUtils.click(Driver.get().findElement(patient));
+        BrowserUtils.waitForPageToLoad(15);
+    }
+
+    public static void clickSidebarSubMenu(String menuName) {
+        By menuLocator = By.xpath(String.format("//li[normalize-space(text())='%s']", menuName));
+        WebElement menu = BrowserUtils.waitForClickablility(menuLocator, 10);
+        menu.click();
+    }
+
+    public static void verifyURLContains(String expectedURLPart) {
+        String currentURL = Driver.get().getCurrentUrl();
+        if (!currentURL.contains(expectedURLPart)) {
+            throw new AssertionError("❌ URL does not contain expected text. Expected: "
+                    + expectedURLPart + " | Actual URL: " + currentURL);
+        }
+        System.out.println("✔ URL validation passed. URL contains: " + expectedURLPart);
     }
 
     public static void enterDateById(String id, String dateValue) {

@@ -386,9 +386,8 @@ public class Registration extends BasePage {
         if (!prefix.isEmpty())
             BrowserUtils.selectFromDropdown(newRegistrationPrefix, prefix);
 
-        BrowserUtils.clearAndSendKeys(newRegistrationFirstName, patient.path("firstName").asText());
+        
         BrowserUtils.clearAndSendKeys(newRegistrationMiddleName, patient.path("middleName").asText());
-        BrowserUtils.clearAndSendKeys(newRegistrationLastName, patient.path("lastName").asText());
 
         String sex = patient.path("sexAssignedAtBirth").asText();
         if (!sex.isEmpty())

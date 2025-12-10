@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class Calendar extends BasePage {
 
-    private static final int dayToPlus = 10;
+    private static final int dayToPlus = 1;
 
     @FindBy(xpath = "//li[text()='Calendar']")
     private WebElement calendarMenu;
@@ -354,15 +354,15 @@ public class Calendar extends BasePage {
         // For existing patient → perform search & select
         if (isExistingPatient == true) {
             BrowserUtils.clearAndSendKeys(searchPatientOrPartnerInput, cfg.patientName);
+
+            // wait for dropdown option and click
+            By patientOptionLocator = By.xpath(
+                    "//ul[@role='listbox']//li[@role='option' and contains(normalize-space(),'" + cfg.patientName
+                            + "')]");
+
+            WebElement patientOption = BrowserUtils.waitForClickablility(patientOptionLocator, 10);
+            BrowserUtils.click(patientOption);
         }
-
-        // wait for dropdown option and click
-        By patientOptionLocator = By.xpath(
-                "//ul[@role='listbox']//li[@role='option' and contains(normalize-space(),'" + cfg.patientName + "')]");
-
-        WebElement patientOption = BrowserUtils.waitForClickablility(patientOptionLocator, 10);
-        BrowserUtils.click(patientOption);
-
         BrowserUtils.waitFor(3);
 
         // ⭐ choose doctor based on mode
@@ -748,7 +748,7 @@ public class Calendar extends BasePage {
         clickTopTab(cfg.tabName);
 
         // Double click on the date to open dialog
-        doubleClickOnDatePlusDays(dayToPlus);
+        doubleClickOnDatePlusDays(1);
 
         // Verify dialog is visible
         verifyAppointmentDialogVisible();

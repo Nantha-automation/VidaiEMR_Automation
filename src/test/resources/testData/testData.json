@@ -1,7 +1,7 @@
 {
   "validLogin": {
-    "username": "Amelia",
-    "password": "A@126#%&34$!"
+    "username": "Admin",
+    "password": "vidai_admin@2023"
   },
   "invalidLogin": {
     "username": "Amelia1",
@@ -357,13 +357,11 @@
       }
     ],
     "newPatientAppointment": {
-      "firstName": "Nantha",
-      "lastName": "Test",
       "sexAssignedAtBirth": "Male",
       "countryCode": "232",
       "mobileNumber": "5551234567",
       "dob": "10/11/1995",
-      "emailId": "nantha.test@example.com",
+      "emailId": "john.doe@example.com",
       "prefix": "Mr.",
       "middleName": "A",
       "bloodGroup": "O+",
@@ -385,5 +383,18 @@
       "areaCode": "90001",
       "successMessage": "Patient registered successfully."
     }
+  },
+  "medicalHistory": {
+    "medicalHistoryPageUrl": "https://99999.preview.vidaisolutions.com/clinical/patients/medical-history/",
+    "searchByRadio": "patient",
+    "searchPatient": "John Doe",
+    "sideBarMenu": "Medical History",
+    "consanguinity": "yes"
+  },
+  "treatmentPlan": {
+    "treatmentPlanPageUrl": "https://99999.preview.vidaisolutions.com/clinical/patients/treatment-plan/",
+    "searchByRadio": "patient",
+    "searchPatient": "John Doe"
+    
   }
 }
