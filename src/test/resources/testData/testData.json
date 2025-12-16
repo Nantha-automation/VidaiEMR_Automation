@@ -394,7 +394,12 @@
   "treatmentPlan": {
     "treatmentPlanPageUrl": "https://99999.preview.vidaisolutions.com/clinical/patients/treatment-plan/",
     "searchByRadio": "patient",
-    "searchPatient": "John Doe"
+    "searchPatient": "John Doe",
+    "drugsRoute": "Nasal/Oral",
+    "drugsFrequency": "2-1-2",
+    "drugsInstruction": "Intravenous slowly",
+    "drugsDoctor": "Dr. James Young",
+    "drugsDays": "2"
     
   }
 }

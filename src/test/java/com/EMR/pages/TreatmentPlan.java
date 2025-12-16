@@ -70,6 +70,9 @@ public class TreatmentPlan {
     @FindBy(xpath = "//button[normalize-space()='Cancel']")
     public WebElement cancelButton;
 
+    @FindBy(xpath = "//p[normalize-space()='View All']")
+    public WebElement viewAll;
+
     @FindBy(xpath = "//button[not(@disabled) and .//img[contains(@alt,'Add Icon')]]")
     public List<WebElement> addIcon;
 
@@ -93,6 +96,21 @@ public class TreatmentPlan {
 
     @FindBy(xpath = "//input[@placeholder='Search by Drug Name, Generic Name']")
     public WebElement searchByDrugNameInput;
+
+    @FindBy(xpath = "//label[contains(normalize-space(), 'Day(s)')]/following::input[@type='number']")
+    public WebElement drugsDaysInput;
+
+    @FindBy(xpath = "//label[normalize-space()='Notes']/following::input[@type='text']")
+    public WebElement drugsNotesInput;
+
+    @FindBy(xpath = "//button[normalize-space()='Place Order']")
+    public WebElement drugsPlaceOrderButton;
+
+    @FindBy(xpath = "//button[.//img[@alt='Back']]")
+    public WebElement drugsBackButton;
+
+    @FindBy(xpath = "//button[contains(@class,'MuiIconButton-colorError')]//*[name()='svg']")
+    public WebElement deleteIcon;
 
     public void navigateToTreatmentPlan() {
         clinicalMenu.click();
@@ -138,13 +156,13 @@ public class TreatmentPlan {
         BrowserUtils.waitForPageToLoad(10);
     }
 
-    public void clickModuleCard(String moduleName) {
+    public void clickCycleRelatedProcedure(String moduleName) {
         By locator = By.xpath(String.format(
                 "//div[contains(@class,'MuiPaper-root')]//*[normalize-space()='%s']/ancestor::div[contains(@class,'MuiPaper-root')][1]",
                 moduleName));
 
-        WebElement card = BrowserUtils.waitForClickablility(locator, 10);
-        card.click();
+        WebElement cycleRelatedProcedure = BrowserUtils.waitForClickablility(locator, 10);
+        cycleRelatedProcedure.click();
     }
 
     public void clickSourceCheckBox(String groupName, String option) {
@@ -196,40 +214,58 @@ public class TreatmentPlan {
     public void addProcedureClick(String notes) {
         BrowserUtils.click(addProcedureButton);
         BrowserUtils.waitForPageToLoad(10);
+        
     }
 
     public List<String> selectNRandomUnselectedOptions(int count) {
         List<String> selectedNames = new ArrayList<>();
 
-        // 1️⃣ Get all NOT-selected items (+ buttons)
-        if (addIcon.isEmpty()) {
+        // 0️⃣ Click View All only if displayed — do NOT fail if not present
+        try {
+            if (viewAll.isDisplayed()) {
+                BrowserUtils.waitForClickablility(viewAll, 5).click();
+                BrowserUtils.waitFor(1); // wait for UI to expand
+                System.out.println("Clicked on 'View All'");
+            }
+        } catch (Exception e) {
+            // Element not present or not visible → ignore and continue
+            System.out.println("'View All' not found. Proceeding without clicking.");
+        }
+
+        // 1️⃣ Now continue selecting unselected options
+        if (addIcon == null || addIcon.isEmpty()) {
             System.out.println("No unselected options available");
             return selectedNames;
         }
 
-        // Shuffle for randomness
+        // Shuffle list randomly
         Collections.shuffle(addIcon);
 
-        // 2️⃣ Iterate through N random items
         int limit = Math.min(count, addIcon.size());
+
         for (int i = 0; i < limit; i++) {
             WebElement addBtn = addIcon.get(i);
 
-            // 3️⃣ Fetch associated aria-label text
-            WebElement pTag = addBtn.findElement(
-                    By.xpath("./ancestor::div[contains(@class,'MuiPaper-root')][1]//p[@aria-label]"));
-            String ariaText = pTag.getAttribute("aria-label").trim();
-            selectedNames.add(ariaText);
+            try {
+                // find the aria-label text for the item
+                WebElement pTag = addBtn.findElement(
+                        By.xpath("./ancestor::div[contains(@class,'MuiPaper-root')][1]//p[@aria-label]"));
+                String ariaText = pTag.getAttribute("aria-label").trim();
+                selectedNames.add(ariaText);
 
-            // 4️⃣ Click + button
-            BrowserUtils.waitForClickablility(addBtn, 10).click();
-            BrowserUtils.waitFor(1);
+                // click + icon
+                BrowserUtils.waitForClickablility(addBtn, 10).click();
+                BrowserUtils.waitFor(1);
 
-            System.out.println("Selected: " + ariaText);
+                System.out.println("Selected: " + ariaText);
+            } catch (Exception e) {
+                System.out.println("Failed to select option: " + e.getMessage());
+            }
         }
 
         return selectedNames;
     }
+
 
     public int getSelectedCountFromGrid() {
         // All selected items = buttons with the Added Icon (tick)
@@ -291,6 +327,20 @@ public class TreatmentPlan {
         return cell.getText().trim();
     }
 
+    public boolean isCellValueMatching(String columnName, String expectedText) {
+
+        String xpath = "//table//tbody//tr/td[count(//table//th[normalize-space()='"
+                + columnName + "']/preceding-sibling::th)+1]//*[normalize-space()]";
+
+        By cellLocator = By.xpath(xpath);
+
+        WebElement cell = BrowserUtils.waitForVisibility(cellLocator, 10);
+        String actualText = cell.getText().trim();
+
+        return actualText.equals(expectedText) || actualText.contains(expectedText);
+    }
+
+
     public void clickDrugsTab() {
         BrowserUtils.click(drugsTab);
         BrowserUtils.waitForPageToLoad(10);
@@ -311,6 +361,27 @@ public class TreatmentPlan {
         field.sendKeys(value);
         BrowserUtils.waitFor(1);
         BrowserUtils.waitForClickablility(firstOptionInDropdown, 10).click();
+    }
+
+    public void fillDrugsDaysAndNotes(String days, String notes) {
+        BrowserUtils.clearAndSendKeys(drugsDaysInput, days);
+        BrowserUtils.clearAndSendKeys(drugsNotesInput, notes);
+    }
+
+    public void clickPlaceOrderInDrugsTab() {
+        BrowserUtils.click(drugsPlaceOrderButton);
+        BrowserUtils.waitForPageToLoad(10);
+        BrowserUtils.click(yesButton);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void clickBackInDrugsTab() {
+        BrowserUtils.click(drugsBackButton);
+        BrowserUtils.waitForPageToLoad(10);
+    }
+
+    public void clickDeleteIcon() {
+        BrowserUtils.click(deleteIcon);
     }
 
     public void performFemaleActions() {
